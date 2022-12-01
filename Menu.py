@@ -6,17 +6,21 @@ GREEN = '\033[92m'
 RED = '\033[31m'
 RESET = '\033[0m'
 
-# Ceci est une proposition de menu, il y a plusieurs propositions faites a l'utilisteurs, le programme se stoppe uniquement
-# Quand l'utilisateur selectionne la commande "q", de cette maniere il peut lancer, un scan, puis un autre, relancer la premier scan etc...
-# L'utilisateur n'a ainsi pas besoin de relancer le programme a chaque fois"
-# Si l'utilisteur entre une mauvaise commande, le programme ne se bloque pas, il indique juste que la commande n'est pas bonne et ainsi 
-# l'utilisateur peut entrer une nouvelle commande
+""" 
+Ceci est une proposition de menu, il y a plusieurs propositions faites a l'utilisteurs, le programme se stoppe uniquement
+Quand l'utilisateur selectionne la commande "q", de cette maniere il peut lancer, un scan, puis un autre, relancer la premier scan etc...
+L'utilisateur n'a ainsi pas besoin de relancer le programme a chaque fois"
 
-# Dans le code, il y a beaucoup de print("blabla"), vous avez juste a le remplacer par une fonction integrant l'utilisation d'un outil ou d'un autre
+Si l'utilisteur entre une mauvaise commande, le programme ne se bloque pas, il indique juste que la commande n'est pas bonne et ainsi 
+l'utilisateur peut entrer une nouvelle commande
 
-# Le prof a indiquer que le scan devait être modulable, quoi de mieux que alors que d'effectuer un scan rapide
-# integrant touts les outils avec les parametres les plus rapide, un scan lent, et un custom scan qui permet a l'utilisateur de lancer un outil precis. 
-# Tout cela rends le programme modulable sans changer la complexite de celui-ci, grace a l'utilisation de fonctions specifiques
+Dans le code, il y a beaucoup de print("blabla"), vous avez juste a le remplacer par une fonction integrant l'utilisation d'un outil ou d'un autre
+
+Le prof a indiquer que le scan devait être modulable, quoi de mieux que alors que d'effectuer un scan rapide
+integrant touts les outils avec les parametres les plus rapide (par exemple dnscan avec une wordlist de 500 mots"),
+un scan lent (par exemple dnscan avec une wordlist de 10000 mots"), et un custom scan qui permet a l'utilisateur de lancer un outil precis.
+Tout cela rends le programme modulable sans changer la complexite de celui-ci, grace a l'utilisation de fonctions specifiques 
+"""
 
 def FirstSummary () :
 	print(BOLD + BLUE + "Veuillez choisir une option : " + RESET)
