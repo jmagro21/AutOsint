@@ -67,20 +67,20 @@ while Rps != "q" :
 		print(RESET, end = '')
 		while Rps != "q" :
 		
-			if Rps == "A" :
+			if (Rps == "A" or Rps == "a") :
 				print("blabla")
 				
-			if Rps == "B" :
+			if (Rps == "B" or Rps == "b") :
 				print("blabla")
 			
-			if Rps == "C" :
+			if (Rps == "C" or Rps == "c") :
 				print("blabla")
 				
-			if Rps == "D" :
+			if (Rps == "D" or Rps == "d") :
 				print("blabla")
 				
       #Si l'utilisateur est con ou s'il rentre une mauvaise commande
-			if(Rps != "A" and Rps != "B" and Rps != "C" and Rps != "D") :
+			if(Rps != "A" and Rps != "B" and Rps != "C" and Rps != "D" and Rps != "a" and Rps != "b" and Rps != "c" and Rps != "d") :
 				print(RED + BOLD + "La commande que vous avez saisie n'existe pas" + RESET)		
 		
 			Rps = str(input(BOLD + BLUE + ">>> (Custom scan) "))
@@ -91,19 +91,20 @@ while Rps != "q" :
 		print(BOLD + BLUE + "Veuillez choisir une option : " + RESET)
 		print("="*50)
 		print("A : blabla")
+		print("B : blabla")
 		print("="*50)
 		
 		Rps = str(input(BOLD + BLUE + ">>> (Settings) "))
 		print(RESET, end = '')
 		while Rps != "q" :
 		
-			if Rps == "A" :
+			if (Rps == "A" or Rps == "a") :
 				print("blabla")
 				
-			if Rps == "B" :
+			if (Rps == "B" or Rps == "b") :
 				print("blabla")
 				
-			if(Rps != "A" and Rps != "B") :
+			if(Rps != "A" and Rps != "a" and Rps != "A" and Rps != "a" ) :
 				print(RED + BOLD + "La commande que vous avez saisie n'existe pas" + RESET)	
 				
 			Rps = str(input(BOLD + BLUE + ">>> (Settings) "))
