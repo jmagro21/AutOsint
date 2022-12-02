@@ -1,7 +1,7 @@
-import os 
+import os
 #On va installer tout les paquets nécessaires pour que le script fonctionne correctement.
 # on met à jour le système et on installe tous les outils nécessaires.
-# Pour que ce script soit utilisable sur l'ensemble des postes. 
+# Pour que ce script soit utilisable sur l'ensemble des postes.
 
 #Installation de Python3
 os.system("apt-get install python3")
@@ -16,14 +16,12 @@ os.system("shodan")
 os.system("shodan init mcctQG1Pu7vfFoHKWGAUeB9X4SSrNN9q")
 
 #DNSSCAN
-os.system("https://github.com/rbsec/dnscan")
-
+os.system("git clone https://github.com/rbsec/dnscan")
+os.system("chmod -R 700 dnscan")
 
 #theHarvester
-os.system("git clone https://github.com/laramies/theHarvester")
-os.system("cd theHarvester")
-os.system("python3.7 -m pip install -r requirements/dev.txt")
-os.system("python3.7 -m pip install -r requirements/base.txt")
+os.system("apt-get install theharvester")
+
 
 #urlscan.io
 
@@ -32,8 +30,3 @@ os.system("python3.7 -m pip install -r requirements/base.txt")
 #Ci-dessous, on met à jour le système et tous les paquets
 os.system("apt-get update")
 os.system("apt-get upgrade -y")
-
-#Script principal qui s'exécute
-exec(open("Main.py").read())
-
-
