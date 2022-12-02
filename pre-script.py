@@ -7,7 +7,7 @@ import os
 os.system("apt-get install python3")
 
 #Installation du module pyfiglet
-os.system("pip install pyfiglet")
+os.system("python3 -m pip install pyfiglet")
 
 
 #Ci-dessous, installation de shodan et initialisation de l'API avec la clé API que l'on a récupérée sur le site shodan.
