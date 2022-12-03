@@ -23,6 +23,13 @@ Tout cela rends le programme modulable sans changer la complexite de celui-ci, g
 
 """
 
+def tri_result_harvester (): # Cette fonction va nous permettre de trier le résultat de sortie de theHarvester pour afficher ça dans un fichier de manière plus propre.
+	fichier_result = open('theHarvesterResult/OutputHarvester', 'r')
+	
+# Je pense que c'est la meilleure façon de récupérer les données sortantes.
+# Peut être que l'on pourrait faire une page web simple mais sympa qui affiche les résultats de chaque scan.
+# C'est plus pro et avoir une page web bien présenté qui présente les résultats c'est un plus.
+
 def FirstSummary () :
 	print(BOLD + BLUE + "Veuillez choisir une option : " + RESET)
 	print("="*50)
@@ -54,6 +61,22 @@ while Rps != "q" :
 		# On ne pourrait plus quitter avec 'q' par exemple. Donc on garde Rps pour TOUTES LES ENTRÉES UTILISATEURS !!!!
 		Rps = str(input(BOLD + BLUE + ">>> (Default Scan) "))
 		print(RESET, end = '') # Ici c'est simplement pour éviter le retour à la ligne.
+
+		print("Nous allons effectuer un scan également sur un nom de domaine avec l'outil theHarvester !")
+		print("Veuillez simplement indiquer le nom de domaine que vous voulez cibler !")
+		print("Attention ne pas saisir le 'www' du nom de domaine !!!!")
+		Rps = str(input(BOLD + BLUE + ">>> (Default Scan) "))
+		print(RESET, end='')
+		os.system("mkdir theHarvesterResult") # On va créer un répertoire dans lequel on va stocker les résultats des différentes commandes et outils
+		os.system("theHarvester -d " + Rps + " " + "-b all > OutputHarvester") # On lance le scan avec le nom de domaine donné par l'utilisateur.
+		os.system("mv OutputHarvester theHarvesterResult/") # On bouge le résultat dans le bon dossier.
+		tri_result_harvester() # Fonction qui doit être codée.
+		#Ci-dessous il faudrat appeler la fonction 'tri_result_harvester' pour trier le fichier de résultat et peut être faire un affichage plus propre.
+
+		print("Nous allons maintenant lancer un scan avec l'outil dnscan pour récupérer des informations liés au DNS !")
+		
+
+
 
 
 	#L'utilisateur peut choisir un outil ou un autre, il les lancera separement 
