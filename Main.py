@@ -25,6 +25,10 @@ Tout cela rends le programme modulable sans changer la complexite de celui-ci, g
 
 def tri_result_harvester (): # Cette fonction va nous permettre de trier le résultat de sortie de theHarvester pour afficher ça dans un fichier de manière plus propre.
 	fichier_result = open('theHarvesterResult/OutputHarvester', 'r')
+	lignes = fichier_result.readlines()
+	for ligne in lignes :
+		print(ligne)
+
 	
 # Je pense que c'est la meilleure façon de récupérer les données sortantes.
 # Peut être que l'on pourrait faire une page web simple mais sympa qui affiche les résultats de chaque scan.
@@ -62,22 +66,41 @@ while Rps != "q" :
 		Rps = str(input(BOLD + BLUE + ">>> (Default Scan) "))
 		print(RESET, end = '') # Ici c'est simplement pour éviter le retour à la ligne.
 
+
+		print("\n")
+
+
 		print("Nous allons effectuer un scan également sur un nom de domaine avec l'outil theHarvester !")
 		print("Veuillez simplement indiquer le nom de domaine que vous voulez cibler !")
-		print("Attention ne pas saisir le 'www' du nom de domaine !!!!")
+		print("Attention ne pas saisir le 'www' du nom de domaine !!!! Exemple : test.fr ")
 		Rps = str(input(BOLD + BLUE + ">>> (Default Scan) "))
 		print(RESET, end='')
 		os.system("mkdir theHarvesterResult") # On va créer un répertoire dans lequel on va stocker les résultats des différentes commandes et outils
-		os.system("theHarvester -d " + Rps + " " + "-b all > OutputHarvester") # On lance le scan avec le nom de domaine donné par l'utilisateur.
+		os.system("theHarvester -d " + Rps + " " + "-b all > OutputHarvester") # On lance le scan avec le nom de domaine donné par l'utilisateur. On récupère l'intégralité de la sortie dans un fichier.
 		os.system("mv OutputHarvester theHarvesterResult/") # On bouge le résultat dans le bon dossier.
 		tri_result_harvester() # Fonction qui doit être codée.
 		#Ci-dessous il faudrat appeler la fonction 'tri_result_harvester' pour trier le fichier de résultat et peut être faire un affichage plus propre.
-
-		print("Nous allons maintenant lancer un scan avec l'outil dnscan pour récupérer des informations liés au DNS !")
 		
 
+		print("\n")
 
 
+		print("Nous allons maintenant lancer un scan avec l'outil dnscan pour récupérer des informations liés au DNS !")
+		print("Veuillez simplement saisir le domaine que vous voulez visez et le script se charge du reste !")
+		print("Pour ce script, vous devez utilisez l'intégralité du nom de dommaine. Exemple : www.test.fr ")
+		os.system("cd dnscan/")
+		Rps = str(input(BOLD + BLUE + ">>> (Default Scan) "))
+		print(RESET, end='')
+		os.system("python3 dnscan.py -d " + Rps + " -o OutputDNScan")
+		os.system("cd ..")
+		
+		
+		print("\n")
+
+
+		print("Nous allons maintenant utiliser l'outil urlscan.io")
+		Rps = str(input(BOLD + BLUE + ">>> (Default Scan) "))
+		print(RESET, end='')
 
 	#L'utilisateur peut choisir un outil ou un autre, il les lancera separement 
 	if Rps == "2" :
