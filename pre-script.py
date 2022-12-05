@@ -16,12 +16,15 @@ os.system("shodan")
 os.system("shodan init mcctQG1Pu7vfFoHKWGAUeB9X4SSrNN9q")
 
 #DNSSCAN
-os.system("git clone https://github.com/rbsec/dnscan")
-os.system("chmod -R 700 dnscan")
+os.system("git clone https://github.com/rbsec/dnscan") # On récupère l'outil sur github
+os.system("python3 -m pip install dnspython") # Les dépendances nécessaires à cet outil ci-dessous.
+os.system("python3 -m pip install netaddr")
+os.system("python3 -m pip install cryptography")
+os.system("python3 -m pip install pip install packaging")
+os.system("chmod -R 700 dnscan/") # On donne les tous les droits à root et rien au reste des utilisateurs.
 
 #theHarvester
 os.system("apt-get install theharvester")
-
 
 #urlscan.io
 
