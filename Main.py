@@ -1,5 +1,7 @@
 import os #Module qui va permettre de passer des commandes systèmes.
 import pyfiglet # On importe le module qui permet de faire un menu sympa
+import requests # Module qui va permettre de faire des requêtes à l'API URLscan.io
+import json # Module permettant de manipuler des fichiers json. (proche du XML)
 
 # Installation de tous les paquets nécessaires au script dans un autre fichier pour être sûr et certain que la machine va être capable de lire le script.
 
@@ -60,11 +62,23 @@ while Rps != "q" :
 		print("Nous allons dans un premier temps utiliser l'outil Shodan qui permet de récupèrer des informations sur une cible bien définie !")
 		print("A la base cet outil est un moteur de recherche qui référence le balayage massif des ports sur internet !")
 		print("Il est possible de l'utiliser en ligne de commande et dans cette situation le script se charge de tout !")
-		print("Veuillez simplement indiquer la cible IP ou Nom de Domaine")
-		# Ci-dessous, on est obligé de garder le nom de variable 'Rps' sinon les autres règles ne s'appliqueront pas dans cette partie du code.
-		# On ne pourrait plus quitter avec 'q' par exemple. Donc on garde Rps pour TOUTES LES ENTRÉES UTILISATEURS !!!!
-		Rps = str(input(BOLD + BLUE + ">>> (Default Scan) "))
-		print(RESET, end = '') # Ici c'est simplement pour éviter le retour à la ligne.
+		print("Voulez-vous scanner une IP ou un domaine ?")
+		print("="*50) # On laisse le choix à l'utilsiateur si la cible
+		print("1. IP") # Une IP 
+		print("2. Domaine") # Un domaine
+		print("="*50)
+		Rps2 = str(input(BOLD + BLUE + ">>> (Default Scan) ")) # On récupère la réponse de l'utilisateur
+		print(RESET, end='') 
+		if Rps2 == "1" :
+			print("Veuillez saisir l'IP que vous voulez scanner !")
+			Rps3 = str(input(BOLD + BLUE + ">>> (Default Scan) ")) # On récupère l'IP cible
+			print(RESET, end='')
+			os.system("shodan host " + Rps3 + " > OutputShodanIP") # On scan et on enregistre dans un fichier de sortie.
+		if Rps2 == "2" :
+			print("Veuille saisir le domaine que vous voulez scanner !")
+			Rps3 = str(input(BOLD + BLUE + ">>> (Default Scan) ")) # On récupère le domaine cible
+			print(RESET, end='')
+			os.system("shodan domain " + Rps3 + " > OutputShodanDomain") # On scan et on enregistre dans un fichier de sortie
 
 
 		print("\n")
@@ -75,10 +89,8 @@ while Rps != "q" :
 		print("Attention ne pas saisir le 'www' du nom de domaine !!!! Exemple : test.fr ")
 		Rps = str(input(BOLD + BLUE + ">>> (Default Scan) "))
 		print(RESET, end='')
-		os.system("mkdir theHarvesterResult") # On va créer un répertoire dans lequel on va stocker les résultats des différentes commandes et outils
 		os.system("theHarvester -d " + Rps + " " + "-b all > OutputHarvester") # On lance le scan avec le nom de domaine donné par l'utilisateur. On récupère l'intégralité de la sortie dans un fichier.
-		os.system("mv OutputHarvester theHarvesterResult/") # On bouge le résultat dans le bon dossier.
-		tri_result_harvester() # Fonction qui doit être codée.
+		# tri_result_harvester() # Fonction qui doit être codée.
 		#Ci-dessous il faudrat appeler la fonction 'tri_result_harvester' pour trier le fichier de résultat et peut être faire un affichage plus propre.
 		
 
@@ -88,20 +100,38 @@ while Rps != "q" :
 		print("Nous allons maintenant lancer un scan avec l'outil dnscan pour récupérer des informations liés au DNS !")
 		print("Veuillez simplement saisir le domaine que vous voulez visez et le script se charge du reste !")
 		print("Pour ce script, vous devez utilisez l'intégralité du nom de dommaine. Exemple : www.test.fr ")
-		os.system("cd dnscan/")
 		Rps = str(input(BOLD + BLUE + ">>> (Default Scan) "))
 		print(RESET, end='')
 		os.system("python3 dnscan.py -d " + Rps + " -o OutputDNScan")
-		os.system("cd ..")
 		
 		
 		print("\n")
 
 
-		print("Nous allons maintenant utiliser l'outil urlscan.io")
+		print("Nous allons maintenant utiliser l'outil urlscan.io qui permet de récupérer des informations sur des URL")
+		print("Il vous suffit d'indiquer l'url que vous voulez scanner !")
+		print("Vous devez donner l'intégralité du lien !! Exemple : https://www.instagram.com/")
 		Rps = str(input(BOLD + BLUE + ">>> (Default Scan) "))
 		print(RESET, end='')
+		headers = {'API-Key':'27a5f4bf-340a-47dd-a710-7a3038a97321','Content-Type':'application/json'}
+		data = {"url": Rps, "visibility": "public"}
+		response = requests.post('https://urlscan.io/api/v1/scan/',headers=headers, data=json.dumps(data))
+		print(response)
+		print(response.json())
 
+
+		os.system("mkdir DefaultScanResult/")
+		os.system("chmod -R 700 DefaultScanResult/")
+		if Rps2 == "1":
+			os.system("mv OutputShodanIP DefaultScanResult/")
+		else :
+			os.system("mv OutputShodanDomain DefaultScanResult/")
+
+		os.system("mv OutputHarvester DefaultScanResult/")
+		os.system("mv OutputDNScan DefaultScanResult/")
+		# os.system("")
+		
+		
 	#L'utilisateur peut choisir un outil ou un autre, il les lancera separement 
 	if Rps == "2" :
 		print(BOLD + BLUE + "Veuillez choisir une option : " + RESET)
