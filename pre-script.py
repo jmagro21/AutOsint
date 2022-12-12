@@ -33,7 +33,6 @@ os.system("apt-get install theharvester")
 #urlscan.io
 os.system("python3 -m pip install requests") # On installe les modules nécessaires pour manipuler l'API.
 
-
 #Ci-dessous, on met à jour le système et tous les paquets
 # os.system("apt-get update")
 # os.system("apt-get upgrade -y")
