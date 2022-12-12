@@ -2,9 +2,9 @@ import os #Module qui va permettre de passer des commandes systèmes.
 import pyfiglet # On importe le module qui permet de faire un menu sympa
 import requests # Module qui va permettre de faire des requêtes à l'API URLscan.io
 import json # Module permettant de manipuler des fichiers json. (proche du XML)
+import time # Nécessaire pour faire attendre le code quelques secondes pour récupérer le résultat de URLSCAN
 
 # Installation de tous les paquets nécessaires au script dans un autre fichier pour être sûr et certain que la machine va être capable de lire le script.
-
 
 BOLD = '\033[1m' # Code couleur qui nous permet de rendre le script un peu plus joli
 BLUE = '\033[94m' # La couleur bleue
@@ -25,16 +25,52 @@ Tout cela rends le programme modulable sans changer la complexite de celui-ci, g
 
 """
 
-def tri_result_harvester (): # Cette fonction va nous permettre de trier le résultat de sortie de theHarvester pour afficher ça dans un fichier de manière plus propre.
-	fichier_result = open('theHarvesterResult/OutputHarvester', 'r')
-	lignes = fichier_result.readlines()
-	for ligne in lignes :
-		print(ligne)
+def verif_IP (a) :
+	nb = a.count(".")
+	while nb != 3 :
+		print("Veuillez saisir une adresse IP ! Exemple : 8.8.8.8")
+		a = str(input(BLUE + BOLD + ">>> (Default Scan) "))
+		print(RESET, end='')
+		nb = a.count(".")
+	return a
 
-	
-# Je pense que c'est la meilleure façon de récupérer les données sortantes.
-# Peut être que l'on pourrait faire une page web simple mais sympa qui affiche les résultats de chaque scan.
-# C'est plus pro et avoir une page web bien présenté qui présente les résultats c'est un plus.
+def verif_domain (a) :
+	nb = a.count(".")
+	while nb != 2 :
+		print("Veuillez saisir un nom de domaine acceptable ! Exemple : www.nomdedomaine.org")
+		a = str(input(BOLD + BLUE + ">>> (Default Scan) "))
+		print(RESET, end='')
+		nb = a.count(".")
+	return a
+
+def verif_domain_harvester (a) :
+	nb = a.count(".")
+	while nb != 1 :
+		print("Veuillez saisir un nom de domaine comme ceci : le-pointcom.fr")
+		a = str(input(BOLD + BLUE + ">>> (Default Scan) "))
+		print(RESET, end='')
+		nb = a.count(".")
+	return a
+
+def verif_domain_dnscan (a) :
+	nb = a.count(".")
+	while nb != 2 :
+		print("Veuillez saisir un nom de domaine comme ceci : www.le-pointcom.fr")
+		a = str(input(BOLD + BLUE + ">>> (Default Scan) "))
+		print(RESET, end='')
+		nb = a.count(".")
+	return a
+
+def verif_urlscan_lien(a) :
+	nb = a.count(".")
+	nb1 = a.count("/")
+	nb2 = a.count(":")
+	while nb != 2 and nb1 != 3 and nb2 != 1 :
+		print("Veuillez saisir un nom de domaine comme ceci : www.le-pointcom.fr")
+		a = str(input(BOLD + BLUE + ">>> (Default Scan) "))
+		print(RESET, end='')
+		nb = a.count(".")
+	return a
 
 def FirstSummary () :
 	print(BOLD + BLUE + "Veuillez choisir une option : " + RESET)
@@ -68,17 +104,25 @@ while Rps != "q" :
 		print("2. Domaine") # Un domaine
 		print("="*50)
 		Rps2 = str(input(BOLD + BLUE + ">>> (Default Scan) ")) # On récupère la réponse de l'utilisateur
-		print(RESET, end='') 
+		print(RESET, end='')
+		
+		while Rps2 != "1" and Rps2 != "2" :
+			print(RED + "Veuillez saisir une commande valide !")
+			Rps2 = str(input(BOLD + BLUE + ">>> (Default Scan)")) # On récupère la réponse de l'utilisateur
+			print(RESET, end='')
+
 		if Rps2 == "1" :
 			print("Veuillez saisir l'IP que vous voulez scanner !")
 			Rps3 = str(input(BOLD + BLUE + ">>> (Default Scan) ")) # On récupère l'IP cible
 			print(RESET, end='')
-			os.system("shodan host " + Rps3 + " > OutputShodanIP") # On scan et on enregistre dans un fichier de sortie.
+			IP = verif_IP(Rps3)
+			os.system("shodan host " + IP + " > OutputShodanIP") # On scan et on enregistre dans un fichier de sortie.
 		if Rps2 == "2" :
 			print("Veuille saisir le domaine que vous voulez scanner !")
 			Rps3 = str(input(BOLD + BLUE + ">>> (Default Scan) ")) # On récupère le domaine cible
 			print(RESET, end='')
-			os.system("shodan domain " + Rps3 + " > OutputShodanDomain") # On scan et on enregistre dans un fichier de sortie
+			DOMAIN = verif_domain(Rps3)
+			os.system("shodan domain " + DOMAIN + " > OutputShodanDomain") # On scan et on enregistre dans un fichier de sortie
 
 
 		print("\n")
@@ -89,8 +133,8 @@ while Rps != "q" :
 		print("Attention ne pas saisir le 'www' du nom de domaine !!!! Exemple : test.fr ")
 		Rps = str(input(BOLD + BLUE + ">>> (Default Scan) "))
 		print(RESET, end='')
-		os.system("theHarvester -d " + Rps + " " + "-b all > OutputHarvester") # On lance le scan avec le nom de domaine donné par l'utilisateur. On récupère l'intégralité de la sortie dans un fichier.
-		# tri_result_harvester() # Fonction qui doit être codée.
+		domain = verif_domain_harvester(Rps) # On vérifie que le nom de domaine entré est valide.
+		os.system("theHarvester -d " + domain + " " + "-b all > OutputHarvester")# On lance le scan avec le nom de domaine donné par l'utilisateur. On récupère l'intégralité de la sortie dans un fichier.
 		#Ci-dessous il faudrat appeler la fonction 'tri_result_harvester' pour trier le fichier de résultat et peut être faire un affichage plus propre.
 		
 
@@ -102,7 +146,8 @@ while Rps != "q" :
 		print("Pour ce script, vous devez utilisez l'intégralité du nom de dommaine. Exemple : www.test.fr ")
 		Rps = str(input(BOLD + BLUE + ">>> (Default Scan) "))
 		print(RESET, end='')
-		os.system("python3 dnscan.py -d " + Rps + " -o OutputDNScan")
+		domaine = verif_domain_dnscan(Rps)
+		os.system("python3 dnscan.py -d " + domaine + " -o OutputDNScan")
 		
 		
 		print("\n")
@@ -113,26 +158,63 @@ while Rps != "q" :
 		print("Vous devez donner l'intégralité du lien !! Exemple : https://www.instagram.com/")
 		Rps = str(input(BOLD + BLUE + ">>> (Default Scan) "))
 		print(RESET, end='')
+		FQDN = verif_urlscan_lien(Rps)
 		headers = {'API-Key':'27a5f4bf-340a-47dd-a710-7a3038a97321','Content-Type':'application/json'}
 		data = {"url": Rps, "visibility": "public"}
 		response = requests.post('https://urlscan.io/api/v1/scan/',headers=headers, data=json.dumps(data))
-		print(response)
-		print(response.json())
 
+		os.system("touch ResultURLScanIo.txt")
+		fichier = open('ResultURLScanIo.txt', 'w')
+		for ligne in response :
+			fichier.write(str(ligne))
+		fichier.close()
+		#Extraction de l'UUID
+		lF = [] #liste tampon qui va accueillir le contenu du fichier
+		#On ouvre le fichier et on ajoute son contenu a la liste
+		fileInput = open("ResultURLScanIo.txt", "r")
+		lignes = fileInput.readlines()
+		for ligne in lignes :
+			lF.append(ligne)
+		fileInput.close()
 
+		texte = str(lF) #On convertie la liste en une string
+		#On cherche dans le fichier le mot uuid qui nous indique l'emplacement de celui-ci
+		emplUUID = texte.find("uuid") + 8 #emplacement de l'uuid
+		#uuid se trouve 4 caracteres apres "uuid", on ajoute la longueur du mot "uuid" ce qui fait 8.
+		#uuid fait 36 caracteres de long, par consequent 
+		uuid = texte[emplUUID : emplUUID + 36]		
+	
+		time.sleep(22) # On fige le code pendant 22 secondes pour atteindre que le scan soit terminé
+		# et que le résulat puisse être récupéré.
+		os.system("curl https://urlscan.io/api/v1/result/" + uuid + "/ > OutputURLScan")#On récupère le résultat du scan dans un fichier.
+		#On stocke le fichier de sortie dans un tableau en attendant
+
+		
 		os.system("mkdir DefaultScanResult/")
 		os.system("chmod -R 700 DefaultScanResult/")
 		if Rps2 == "1":
 			os.system("mv OutputShodanIP DefaultScanResult/")
-		else :
+		elif Rps2 == "2":
 			os.system("mv OutputShodanDomain DefaultScanResult/")
 
 		os.system("mv OutputHarvester DefaultScanResult/")
 		os.system("mv OutputDNScan DefaultScanResult/")
-		# os.system("")
+		os.system("rm ResultURLScanIo.txt")
 		
-		
-	#L'utilisateur peut choisir un outil ou un autre, il les lancera separement 
+		print("Nous avons exécuter l'ensemble des outils avec les paramètres par défaut !")
+		print("Vous pouvez retrouver l'ensemble des résultats dans le fichier DefaultScanResult \n")
+		print("Voulez-vous continuer le script ou quitter ce dernier ?")
+		print("="*50)
+		print("q. Quitter le script ")
+		print("h. Revenir au menu principal ")
+		print("="*50)
+		Rps = str(input(BOLD + BLUE + ">>> (Default Scan) "))
+		print(RESET, end='')
+
+		if Rps == "q" or Rps == "Q" :
+			exit()
+
+	#L'utilisateur peut choisir un outil ou un autre 
 	if Rps == "2" :
 		print(BOLD + BLUE + "Veuillez choisir une option : " + RESET)
 		print("="*50)
