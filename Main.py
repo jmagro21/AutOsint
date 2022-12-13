@@ -134,10 +134,20 @@ while Rps != "q" :
 		Rps = str(input(BOLD + BLUE + ">>> (Default Scan) "))
 		print(RESET, end='')
 		domain = verif_domain_harvester(Rps) # On vérifie que le nom de domaine entré est valide.
-		os.system("theHarvester -d " + domain + " " + "-b all > OutputHarvester")# On lance le scan avec le nom de domaine donné par l'utilisateur. On récupère l'intégralité de la sortie dans un fichier.
+		results = os.popen("theHarvester -d " + domain + " " + "-b all > OutputHarvester").read()# On lance le scan avec le nom de domaine donné par l'utilisateur. On récupère l'intégralité de la sortie dans un fichier.
 		#Ci-dessous il faudrat appeler la fonction 'tri_result_harvester' pour trier le fichier de résultat et peut être faire un affichage plus propre.
-		
-
+		#on lui demande l'adresse
+		print("Veuillez patienter quelque seconde...")
+		# Trier les résultats
+		results_list = results.split("\n")
+		results_list = [result for result in results_list if result]  # retirer les éléments vides
+		results_list.sort()
+		# Afficher les résultats triés
+		for result in results_list:
+			print(result)
+			with open("DefaultScanTheHarvester.txt","w") as file :
+				file.write(results)
+    
 		print("\n")
 
 
@@ -184,7 +194,7 @@ while Rps != "q" :
 		#uuid fait 36 caracteres de long, par consequent 
 		uuid = texte[emplUUID : emplUUID + 36]		
 	
-		time.sleep(22) # On fige le code pendant 22 secondes pour atteindre que le scan soit terminé
+		time.sleep(22) # On fige le code pendant 22 secondes pour attendre que le scan soit terminé
 		# et que le résulat puisse être récupéré.
 		os.system("curl https://urlscan.io/api/v1/result/" + uuid + "/ > OutputURLScan")#On récupère le résultat du scan dans un fichier.
 		#On stocke le fichier de sortie dans un tableau en attendant
@@ -234,20 +244,41 @@ while Rps != "q" :
 				
 			if (Rps == "B" or Rps == "b") :
 				#demande utilisateur
-				print("h - help")
-				print("do - tout faire sur le future DNS donné ")
-				Souhait = input("Que  souhaitez vous faire ? : ")
+				end=" "
+				Option1="all"
+				while end != "do" :
+					print("****************************************")
+					print("h - help")
+					print("****************************************")
+					print("google - scanez via google")
+					print("****************************************")
+					print("do - tout faire sur le future DNS donné ")
+					print("****************************************")
+					print("ex - quitter theHarvester")
+					print("****************************************")
+					Souhait = input("Que  souhaitez vous faire ? : ")
 
-				#verification de la demande 
-				if Souhait == "h" :
-					print("Voici ce que vous pouvez faire avec ce script")
-					os.system("theHarvester")
-				elif Souhait == "do" : 
+					#verification de la demande 
+					if Souhait == "h" :
+						print("Voici ce que vous pouvez faire avec ce script")
+						os.system("theHarvester")
+						input("Appuyez sur Entree pour continuer...")
+					elif Souhait == "google" :
+						print("L'option 'google' est enregistré")
+						Option1 = "google"
+						input("Appuyez sur Entree pour continuer...")
+					elif Souhait == "ex" :
+						print("Sortie de TheHarvester")
+						end = "do"
+					elif Souhait == "do" :
+						end = "do"
+      
+				if Souhait != end : 
 					#on lui demande l'adresse
 					DNS = input("veuillez saisir l'adresse DNS à Scanner ")
 					print("Veuillez patienter quelque seconde...")
 					#on fait tourner la command de façon non visible pour l'utilisateur
-					results = os.popen("theHarvester -d "+DNS+" -b google").read()
+					results = os.popen("theHarvester -d "+DNS+" -b"+Option1).read()
 
 					# Trier les résultats
 					results_list = results.split("\n")
@@ -257,10 +288,10 @@ while Rps != "q" :
 					# Afficher les résultats triés
 					for result in results_list:
 						print(result)
-						with open("resultat.txt","w") as file :
+						with open("ResultatTheHarvester.txt","w") as file :
 							file.write(results)
-				else : 
-					print("Vous n'avez rien saisi.")
+				input("Appuyez sur Entree pour continuer...")
+     
      
 			if (Rps == "C" or Rps == "c") :
 				print("blabla")
