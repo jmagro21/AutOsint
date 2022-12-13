@@ -233,8 +233,35 @@ while Rps != "q" :
 				print("blabla")
 				
 			if (Rps == "B" or Rps == "b") :
-				print("blabla")
-			
+				#demande utilisateur
+				print("h - help")
+				print("do - tout faire sur le future DNS donné ")
+				Souhait = input("Que  souhaitez vous faire ? : ")
+
+				#verification de la demande 
+				if Souhait == "h" :
+					print("Voici ce que vous pouvez faire avec ce script")
+					os.system("theHarvester")
+				elif Souhait == "do" : 
+					#on lui demande l'adresse
+					DNS = input("veuillez saisir l'adresse DNS à Scanner ")
+					print("Veuillez patienter quelque seconde...")
+					#on fait tourner la command de façon non visible pour l'utilisateur
+					results = os.popen("theHarvester -d "+DNS+" -b google").read()
+
+					# Trier les résultats
+					results_list = results.split("\n")
+					results_list = [result for result in results_list if result]  # retirer les éléments vides
+					results_list.sort()
+
+					# Afficher les résultats triés
+					for result in results_list:
+						print(result)
+						with open("resultat.txt","w") as file :
+							file.write(results)
+				else : 
+					print("Vous n'avez rien saisi.")
+     
 			if (Rps == "C" or Rps == "c") :
 				print("blabla")
 				
