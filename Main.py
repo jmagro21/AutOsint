@@ -177,6 +177,14 @@ def verif_souhait (a) :
 		print(RESET, end='')
 	return a
 
+def verif_souhait_shodan (a) :
+	nb = a.count(".")
+	while nb != 2 or nb != 3 :
+		print("Veuillez saisir un nom de domaine ou une adresse IP dans le format suivant ! IP : 8.8.8.8 ; domaine : www.test.fr")
+		a = str(input(BOLD + BLUE + ">>> (Custom Scan) "))
+		print(RESET, end='')
+	return a
+
 #Affichage de ma baniere
 titre = pyfiglet.figlet_format("AutOsint", font = "slant" )
 print(titre)
@@ -490,7 +498,27 @@ while Rps != "q" :
 			input("Appuyez sur Entree pour continuer...")
 
 		if service['shodan'] == 'Vraie' :
-			print()
+			print("\n")
+			print("Vous allez paramétrer shodan !")
+			print("La première chose à faire est de choisir la cible : IP ou domaine !")
+			print("Veuillez indiquer la cible que vous voulez scaner ! Exemple IP : 8.8.8.8 ; Exemple domaine : www.test.fr")
+			Souhait = str(input(BOLD + BLUE + ">>> (Custom Scan) "))
+			print(RESET, end='')
+			verif_souhait = verif_souhait_shodan(Souhait)
+
+			if verif_souhait.count(".") == 3 :
+				print("Vous avez décidé de scaner une IP.")
+				print("Voila ce que nous vous proposons d'effectuer sur une IP.")
+				print("="*50)
+				print("1. Honeypot - Permet de savoir si la cible est un pot de miel")
+				print("2. ")
+				print("="*50)
+			if verif_souhait.count(".") == 2 :
+				print("Vous avez décidé de scaner un domaine.")
+				print("Voila ce que nous vous proposons d'effectuer sur un domaine.")
+				print("="*50)
+
+				print("="*50)
 
 		if service['urlscan'] == 'Vraie' :
 			print()
