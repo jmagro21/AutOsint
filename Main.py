@@ -3,7 +3,7 @@ import pyfiglet # On importe le module qui permet de faire un menu sympa
 import requests # Module qui va permettre de faire des requêtes à l'API URLscan.io
 import json # Module permettant de manipuler des fichiers json. (proche du XML)
 import time # Nécessaire pour faire attendre le code quelques secondes pour récupérer le résultat de URLSCAN
-
+import yaml # On importe le module yaml pour manipuler les fichier du même nom.
 # Installation de tous les paquets nécessaires au script dans un autre fichier pour être sûr et certain que la machine va être capable de lire le script.
 
 BOLD = '\033[1m' # Code couleur qui nous permet de rendre le script un peu plus joli
@@ -24,6 +24,71 @@ un scan lent (par exemple dnscan avec une wordlist de 10000 mots"), et un custom
 Tout cela rends le programme modulable sans changer la complexite de celui-ci, grace a l'utilisation de fonctions specifiques.
 
 """
+
+def verif_dependance (a) : # Fonction qui vérifie l'entrée utilisateur demandée pour l'installation des dépendances nécessaires au script.
+	while a != "1" and a != "2" : # Si différent des deux options qu'on propose on redemande en boucle.
+		print("Veuillez saisir une valeur accepté, 1 ou 2")
+		a = str(input(BOLD + BLUE + ">>> "))
+		print(RESET, end='')
+	return a
+
+
+titre0 = pyfiglet.figlet_format("Installation des outils nécessaires", font = "slant" )
+print(titre0)
+print("="*50)
+print("Voulez-vous installer toutes dépendances nécessaires pour le script ? \n")
+print("1. Oui")
+print("2. Non")
+print("="*50)
+print("\n")
+Rps = str(input(BOLD + BLUE + ">>> "))
+print(RESET, end='')
+apres_verif = verif_dependance(Rps)
+#On va installer tout les paquets nécessaires pour que le script fonctionne correctement.
+# on met à jour le système et on installe tous les outils nécessaires.
+# Pour que ce script soit utilisable sur l'ensemble des postes.
+
+
+if apres_verif == "1" :
+	#Installation de Python3
+	os.system("apt-get install python3")
+
+	#Installation du module pyfiglet
+	os.system("python3 -m pip install pyfiglet")
+
+	# Installation de l'outil curl qui va être utile avec URLscan.io pour récupérer les résultats des scans.
+	os.system("apt-get install curl")
+
+	#Installation du module yaml
+	os.system("python3 -m pip install pyyaml")
+
+	#Ci-dessous, installation de shodan et initialisation de l'API avec la clé API que l'on a récupérée sur le site shodan.
+	os.system("python3 -m pip install shodan")
+	os.system("shodan")
+	os.system("shodan init mcctQG1Pu7vfFoHKWGAUeB9X4SSrNN9q")
+
+	#DNSSCAN
+	os.system("git clone https://github.com/rbsec/dnscan") # On récupère l'outil sur github
+	os.system("python3 -m pip install dnspython") # Les dépendances nécessaires à cet outil ci-dessous.
+	os.system("python3 -m pip install netaddr")
+	os.system("python3 -m pip install cryptography")
+	os.system("python3 -m pip install pip install packaging")
+	os.system("mv dnscan/* ../*") # On donne les tous les droits à root et rien au reste des utilisateurs.
+	os.system("rm -r dnscan/")
+	os.system("chmod -R 700 ../*")
+
+	#theHarvester
+	os.system("apt-get install theharvester")
+
+	#urlscan.io
+	os.system("python3 -m pip install requests") # On installe les modules nécessaires pour manipuler l'API.
+
+elif apres_verif == "2" :
+	print("\0")
+
+print("="*50)
+print("\n")
+
 
 def verif_IP (a) :
 	nb = a.count(".")
@@ -81,6 +146,37 @@ def FirstSummary () :
 	print("q : Quit") # Permet à l'utilisateur de quitter le script.
 	print("="*50)
 
+def SummaryTools () :
+	print(BOLD + BLUE + "Veuillez choisir une option : " + RESET)
+	print("="*50)
+	print("a : Dnscan")
+	print("b : TheHarvester")
+	print("c : Shodan")
+	print("d : Urlscan")
+	print("q : Quit")
+	print("="*50)
+
+def verif_tools (a) :
+	while a != "a" and a != "b" and a != "c" and a != "d" and a != "q":
+		print("Veuillez saisir une réponse acceptée !")
+		a = str(input(BOLD + BLUE + ">>> (Custom Scan) "))
+		print(RESET, end='')
+	return a
+
+def autre_outil () :
+	print("="*50)
+	print("Voulez-vous utilisez un autre outil ?")
+	print("1. Oui")
+	print("2. Non, passer à l'execution")
+	print("="*50)
+
+def verif_souhait (a) :
+	while a != "h" and a != "ggl" and a != "do" and a != "p" and a != "ex" :
+		print("Veuillez saisir une réponse parmi celle proposées ! Exemple : ggl")
+		a = str(input(BOLD + BLUE + ">>> (Custom Scan) "))
+		print(RESET, end='')
+	return a
+
 #Affichage de ma baniere
 titre = pyfiglet.figlet_format("AutOsint", font = "slant" )
 print(titre)
@@ -134,20 +230,10 @@ while Rps != "q" :
 		Rps = str(input(BOLD + BLUE + ">>> (Default Scan) "))
 		print(RESET, end='')
 		domain = verif_domain_harvester(Rps) # On vérifie que le nom de domaine entré est valide.
-		results = os.popen("theHarvester -d " + domain + " " + "-b all > OutputHarvester").read()# On lance le scan avec le nom de domaine donné par l'utilisateur. On récupère l'intégralité de la sortie dans un fichier.
+		os.system("theHarvester -d " + domain + " " + "-b all > OutputHarvester")# On lance le scan avec le nom de domaine donné par l'utilisateur. On récupère l'intégralité de la sortie dans un fichier.
 		#Ci-dessous il faudrat appeler la fonction 'tri_result_harvester' pour trier le fichier de résultat et peut être faire un affichage plus propre.
-		#on lui demande l'adresse
-		print("Veuillez patienter quelque seconde...")
-		# Trier les résultats
-		results_list = results.split("\n")
-		results_list = [result for result in results_list if result]  # retirer les éléments vides
-		results_list.sort()
-		# Afficher les résultats triés
-		for result in results_list:
-			print(result)
-			with open("DefaultScanTheHarvester.txt","w") as file :
-				file.write(results)
-    
+		
+
 		print("\n")
 
 
@@ -194,9 +280,9 @@ while Rps != "q" :
 		#uuid fait 36 caracteres de long, par consequent 
 		uuid = texte[emplUUID : emplUUID + 36]		
 	
-		time.sleep(22) # On fige le code pendant 22 secondes pour attendre que le scan soit terminé
+		time.sleep(22) # On fige le code pendant 22 secondes pour atteindre que le scan soit terminé
 		# et que le résulat puisse être récupéré.
-		os.system("curl https://urlscan.io/api/v1/result/" + uuid + "/ > OutputURLScan")#On récupère le résultat du scan dans un fichier.
+		os.system("curl https://urlscan.io/api/v1/result/" + uuid + "/ > OutputURLScan.json")#On récupère le résultat du scan dans un fichier.
 		#On stocke le fichier de sortie dans un tableau en attendant
 
 		
@@ -226,95 +312,205 @@ while Rps != "q" :
 
 	#L'utilisateur peut choisir un outil ou un autre 
 	if Rps == "2" :
-		print(BOLD + BLUE + "Veuillez choisir une option : " + RESET)
-		print("="*50)
-		print("A : Dnscan")
-		print("B : TheHarvester")
-		print("C : Shodan")
-		print("D : Urlscan")
-		print("q : Quit")
-		print("="*50)
+
+		print("Avant de démarrer il est important de préciser que cette partie ne vous expliquera pas le fonctionnement de chaque outil !")
+		print("Il est de votre fait de vous renseigner sur chaque outil avant d'utiliser cette partie du script !")
+		print("Enjoyyyy !")
+		#On prévient l'utilisateur que nous n'allons pas le renseigner sur chaque outil car ce n'est pas le but de l'outil.
+
+		with open('config.yml', 'r') as file :
+			service = yaml.safe_load(file)
 		
-		Rps = str(input(BOLD + BLUE + ">>> (Custom scan) "))
+		SummaryTools()
+
+		Tool_Rps = str(input(BOLD + BLUE + ">>> (Custom scan) "))
 		print(RESET, end = '')
+		Tool_Rps.rstrip("\n")
+		Tools1 = verif_tools(Tool_Rps)
+		if Tools1 == "a" :
+			service['Dnscan'] = 'Vraie'
+		elif Tools1 == "b" :
+			service['Harvester'] = 'Vraie'
+		elif Tools1 == "c" :
+			service['shodan'] = 'Vraie'
+		elif Tools1 == "d" :
+			service['urlscan'] = 'Vraie'
+		elif Tools1 == "q" :
+			exit()
+
+		print("\n")
+	
+		autre_outil()
+		Autre_outil = str(input(BOLD + BLUE + ">>> (Custom Scan) "))
+		verif_autreOutil = verif_dependance(Autre_outil)
+		if verif_autreOutil == "1" :
+			SummaryTools()
+			Tool_Rps = str(input(BOLD + BLUE + ">>> (Custom scan) "))
+			print(RESET, end = '')
+			Tool_Rps.rstrip("\n")
+			Tools2 = verif_tools(Tool_Rps)
+			if Tools2 == "a" :
+				service['Dnscan'] = 'Vraie'
+			elif Tools2 == "b" :
+				service['Harvester'] = 'Vraie'
+			elif Tools2 == "c" :
+				service['shodan'] = 'Vraie'
+			elif Tools2 == "d" :
+				service['urlscan'] = 'Vraie'
+			elif Tools2 == "q" :
+				exit()
+
+			autre_outil()
+			Autre_outil = str(input(BOLD + BLUE + ">>> (Custom Scan) "))
+			verif_autreOutil = verif_dependance(Autre_outil)
+			if verif_autreOutil == "1" :
+				SummaryTools()
+				Tool_Rps = str(input(BOLD + BLUE + ">>> (Custom scan) "))
+				print(RESET, end = '')
+				Tool_Rps.rstrip("\n")
+				Tools3 = verif_tools(Tool_Rps)
+				if Tools3 == "a" :
+					service['Dnscan'] = 'Vraie'
+				elif Tools3 == "b" :
+					service['Harvester'] = 'Vraie'
+				elif Tools3 == "c" :
+					service['shodan'] = 'Vraie'
+				elif Tools3 == "d" :
+					service['urlscan'] = 'Vraie'
+				elif Tools3 == "q" :
+					exit()
+				
+				autre_outil()
+				Autre_outil = str(input(BOLD + BLUE + ">>> (Custom Scan) "))
+				verif_autreOutil = verif_dependance(Autre_outil)
+				if verif_autreOutil == "1" :
+					SummaryTools()
+					Tool_Rps = str(input(BOLD + BLUE + ">>> (Custom scan) "))
+					print(RESET, end = '')
+					Tool_Rps.rstrip("\n")
+					Tools4 = verif_tools(Tool_Rps)
+					if Tools4 == "a" :
+						service['Dnscan'] = 'Vraie'
+					elif Tools4 == "b" :
+						service['Harvester'] = 'Vraie'
+					elif Tools4 == "c" :
+						service['shodan'] = 'Vraie'
+					elif Tools4 == "d" :
+						service['urlscan'] = 'Vraie'
+					elif Tools4 == "q" :
+						exit()
+
+		else :
+			print("\0")
+		
+		print("\n")
+
+		with open('config.yml', 'w') as dump_file :
+			yaml.dump(service, dump_file)
+
+		print("\n")
+		print(RESET + "Maintenant que vous avez choisi vos outils, nous allons vous demandez les différentes options que vous souhaitez utiliser avec vos outils !")
+		print(RESET + "Allons-y !")
+		print("\n")
+
+		with open('config.yml', 'r') as file :
+			service = yaml.safe_load(file)
+		
+		if service['Dnscan'] == 'Vraie' :
+			print()
+		
+		if service['Harvester'] == 'Vraie' :
+			print("Vous allez paramétrer theHarvester !")
+			end=" "
+			Option1="all"
+			while end != "do" :
+				print("="*50)
+				print("ggl - scanez via google")
+				print("lk - scanez via Linkedin")
+				print("do - tout faire sur le future DNS donné ")
+				print("p - Personaliser la commande")
+				print("ex - quitter theHarvester")
+				print("="*50)
+				Souhait = str(input(BOLD + BLUE + ">>> (Custom Scan) "))
+				print(RESET, end='')
+				Souhait.rstrip("\n")
+				VERIF_SOUHAIT = verif_souhait(Souhait)
+				#verification de la demande 
+				if VERIF_SOUHAIT == "ggl" :
+					Perso = "true"
+					print("L'option 'google' est enregistré")
+					Option1 = "ggl"
+					input("Appuyez sur Entree pour continuer...")
+				elif VERIF_SOUHAIT == "lk" :
+					Perso = "true"
+					print("L'option 'linkedin' est enregistré")
+					Option1 = "linkedin"
+					input("Appuyez sur Entree pour continuer...")
+				elif VERIF_SOUHAIT == "p" :
+					Perso = "true"
+					print("Veuillez saisir la commande au complet")
+					CommandHarvester=input()
+					print("Votre commande à été personalisé, voulez vous lancer TheHarvester avec celle-ci ?")
+					QuestionHarvester=input("O (OUI), n (non)")
+					if QuestionHarvester == "O" or QuestionHarvester == "o" :
+						Souhait="do"
+						end = "do"
+				elif VERIF_SOUHAIT == "ex" :
+					print("Vous quittez TheHarvester")
+					print(RED + "ATTENTION, le scan ne sera pas exécuté !")
+					print(RESET, end='')
+					end = "do"
+				elif VERIF_SOUHAIT == "do" :
+					end = "do"
+      
+			if Souhait != end : 
+				if Perso == "true" :
+					results = os.popen(CommandHarvester).read()
+				else : 
+					#on lui demande l'adresse
+					DNS = str(input(BOLD + BLUE + "veuillez saisir l'adresse DNS à Scanner ! Exemple : test.fr et pas www.test.fr"))
+					print(RESET, end='')
+					#on fait tourner la command de façon non visible pour l'utilisateur
+					verif_DNS = verif_domain_harvester(DNS)
+					results = os.popen("theHarvester -d "+verif_DNS+" -b "+Option1).read()
+
+				print("Veuillez patienter quelque seconde...")
+
+				# Trier les résultats
+				results_list = results.split("\n")
+				results_list = [result for result in results_list if result]  # retirer les éléments vides
+				results_list.sort()
+
+				# Afficher les résultats triés
+				for result in results_list:
+					print(result)
+					with open("ResultatTheHarvester.txt","w") as file :
+						file.write(results)
+				print("Les résulats sont enregistrés dans le fichier ResultatTheHArvester.txt qui sera stocké dans le dossier CustomScanOutput")
+			input("Appuyez sur Entree pour continuer...")
+
+		if service['shodan'] == 'Vraie' :
+			print()
+
+		if service['urlscan'] == 'Vraie' :
+			print()
+
+
+
+
+
+
+
+
+
 		while Rps != "q" :
 		
 			if (Rps == "A" or Rps == "a") :
 				print("blabla")
 				
 			if (Rps == "B" or Rps == "b") :
-				#demande utilisateur
-				end=" "
-				Option1="all"
-				while end != "do" :
-					print("****************************************")
-					print("h - help")
-					print("****************************************")
-					print("ggl - scanez via google")
-					print("****************************************")
-					print("lk - scanez via Linkedin")
-					print("****************************************")
-					print("do - tout faire sur le future DNS donné ")
-					print("****************************************")
-					print("p - Personaliser la commande")
-					print("****************************************")
-					print("ex - quitter theHarvester")
-					print("****************************************")
-					Souhait = input("Que  souhaitez vous faire ? : ")
-
-					#verification de la demande 
-					if Souhait == "h" :
-						print("Voici ce que vous pouvez faire avec ce script")
-						os.system("theHarvester")
-						input("Appuyez sur Entree pour continuer...")
-					elif Souhait == "google" :
-						print("L'option 'google' est enregistré")
-						Option1 = "ggl"
-						input("Appuyez sur Entree pour continuer...")
-					elif Souhait == "lk" :
-						print("L'option 'linkedin' est enregistré")
-						Option1 = "linkedin"
-						input("Appuyez sur Entree pour continuer...")
-					elif Souhait == "P" or Souhait =="p" :
-						Perso = "true"
-						print("Veuillez saisir la commande au complet")
-						CommandHarvester=input()
-						print("Votre commande à été personalisé, voulez vous lancer TheHarvester avec celle-ci ?")
-						QuestionHarvester=input("O (OUI), n (non)")
-						if QuestionHarvester == "O" or QuestionHarvester == "o" :
-							Souhait="do"
-							end = "do"
-					elif Souhait == "ex" :
-						print("Vous quittez TheHarvester")
-						end = "do"
-					elif Souhait == "do" :
-						end = "do"
-      
-				if Souhait != end : 
-					if Perso=="true" :
-						results = os.popen(CommandHarvester).read()
-					else : 
-						#on lui demande l'adresse
-						DNS = input("veuillez saisir l'adresse DNS à Scanner ")
-						#on fait tourner la command de façon non visible pour l'utilisateur
-						results = os.popen("theHarvester -d "+DNS+" -b "+Option1).read()
-
-					print("Veuillez patienter quelque seconde...")
-
-					# Trier les résultats
-					results_list = results.split("\n")
-					results_list = [result for result in results_list if result]  # retirer les éléments vides
-					results_list.sort()
-
-					# Afficher les résultats triés
-					for result in results_list:
-						print(result)
-						with open("ResultatTheHarvester.txt","w") as file :
-							file.write(results)
-					print("Les résulats sont enregistrés dans ResultatTheHArvester.txt")
-				input("Appuyez sur Entree pour continuer...")
-     
-     
+				print("blabla")
+			
 			if (Rps == "C" or Rps == "c") :
 				print("blabla")
 				
