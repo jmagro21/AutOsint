@@ -250,9 +250,13 @@ while Rps != "q" :
 					print("****************************************")
 					print("h - help")
 					print("****************************************")
-					print("google - scanez via google")
+					print("ggl - scanez via google")
+					print("****************************************")
+					print("lk - scanez via Linkedin")
 					print("****************************************")
 					print("do - tout faire sur le future DNS donné ")
+					print("****************************************")
+					print("p - Personaliser la commande")
 					print("****************************************")
 					print("ex - quitter theHarvester")
 					print("****************************************")
@@ -265,20 +269,37 @@ while Rps != "q" :
 						input("Appuyez sur Entree pour continuer...")
 					elif Souhait == "google" :
 						print("L'option 'google' est enregistré")
-						Option1 = "google"
+						Option1 = "ggl"
 						input("Appuyez sur Entree pour continuer...")
+					elif Souhait == "lk" :
+						print("L'option 'linkedin' est enregistré")
+						Option1 = "linkedin"
+						input("Appuyez sur Entree pour continuer...")
+					elif Souhait == "P" or Souhait =="p" :
+						Perso = "true"
+						print("Veuillez saisir la commande au complet")
+						CommandHarvester=input()
+						print("Votre commande à été personalisé, voulez vous lancer TheHarvester avec celle-ci ?")
+						QuestionHarvester=input("O (OUI), n (non)")
+						if QuestionHarvester == "O" or QuestionHarvester == "o" :
+							Souhait="do"
+							end = "do"
 					elif Souhait == "ex" :
-						print("Sortie de TheHarvester")
+						print("Vous quittez TheHarvester")
 						end = "do"
 					elif Souhait == "do" :
 						end = "do"
       
 				if Souhait != end : 
-					#on lui demande l'adresse
-					DNS = input("veuillez saisir l'adresse DNS à Scanner ")
+					if Perso=="true" :
+						results = os.popen(CommandHarvester).read()
+					else : 
+						#on lui demande l'adresse
+						DNS = input("veuillez saisir l'adresse DNS à Scanner ")
+						#on fait tourner la command de façon non visible pour l'utilisateur
+						results = os.popen("theHarvester -d "+DNS+" -b "+Option1).read()
+
 					print("Veuillez patienter quelque seconde...")
-					#on fait tourner la command de façon non visible pour l'utilisateur
-					results = os.popen("theHarvester -d "+DNS+" -b"+Option1).read()
 
 					# Trier les résultats
 					results_list = results.split("\n")
@@ -290,6 +311,7 @@ while Rps != "q" :
 						print(result)
 						with open("ResultatTheHarvester.txt","w") as file :
 							file.write(results)
+					print("Les résulats sont enregistrés dans ResultatTheHArvester.txt")
 				input("Appuyez sur Entree pour continuer...")
      
      
