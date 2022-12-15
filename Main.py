@@ -238,9 +238,19 @@ while Rps != "q" :
 		Rps = str(input(BOLD + BLUE + ">>> (Default Scan) "))
 		print(RESET, end='')
 		domain = verif_domain_harvester(Rps) # On vérifie que le nom de domaine entré est valide.
-		os.system("theHarvester -d " + domain + " " + "-b all > OutputHarvester")# On lance le scan avec le nom de domaine donné par l'utilisateur. On récupère l'intégralité de la sortie dans un fichier.
+		results = os.popen("theHarvester -d " + domain + " " + "-b all > OutputHarvester").read()# On lance le scan avec le nom de domaine donné par l'utilisateur. On récupère l'intégralité de la sortie dans un fichier.
 		#Ci-dessous il faudrat appeler la fonction 'tri_result_harvester' pour trier le fichier de résultat et peut être faire un affichage plus propre.
-		
+		#on lui demande l'adresse
+		print("Veuillez patienter quelque seconde...")
+		# Trier les résultats
+		results_list = results.split("\n")
+		results_list = [result for result in results_list if result]  # retirer les éléments vides
+		results_list.sort()
+		# Afficher les résultats triés
+		for result in results_list:
+			print(result)
+			with open("DefaultScanTheHarvester.txt","w") as file :
+				file.write(results)
 
 		print("\n")
 
@@ -431,6 +441,8 @@ while Rps != "q" :
 			print("Vous allez paramétrer theHarvester !")
 			end=" "
 			Option1="all"
+			Perso="False"
+			CommandHarvester=""
 			while end != "do" :
 				print("="*50)
 				print("ggl - scanez via google")
@@ -471,8 +483,9 @@ while Rps != "q" :
 				elif VERIF_SOUHAIT == "do" :
 					end = "do"
       
-			if Souhait != end : 
+			if Souhait == end : 
 				if Perso == "true" :
+					print("Veuillez patienter quelque seconde...")
 					results = os.popen(CommandHarvester).read()
 				else : 
 					#on lui demande l'adresse
@@ -480,9 +493,8 @@ while Rps != "q" :
 					print(RESET, end='')
 					#on fait tourner la command de façon non visible pour l'utilisateur
 					verif_DNS = verif_domain_harvester(DNS)
+					print("Veuillez patienter quelque seconde...")
 					results = os.popen("theHarvester -d "+verif_DNS+" -b "+Option1).read()
-
-				print("Veuillez patienter quelque seconde...")
 
 				# Trier les résultats
 				results_list = results.split("\n")
