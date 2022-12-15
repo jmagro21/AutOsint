@@ -1,0 +1,9 @@
+pyfiglet
+dnspython
+netaddr
+cryptography
+packaging
+requests
+time
+json
+pyyaml
