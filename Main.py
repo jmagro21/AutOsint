@@ -179,8 +179,38 @@ def verif_souhait (a) :
 
 def verif_souhait_shodan (a) :
 	nb = a.count(".")
-	while nb != 2 or nb != 3 :
+	while nb != 2 and nb != 3 :
 		print("Veuillez saisir un nom de domaine ou une adresse IP dans le format suivant ! IP : 8.8.8.8 ; domaine : www.test.fr")
+		a = str(input(BOLD + BLUE + ">>> (Custom Scan) "))
+		print(RESET, end='')
+	return a
+
+def verif_choix_shodan_IP (a) :
+	while a != "1" and a != "2" and a != "3" and a != "4" and a != "5" :
+		print("Veuillez saisir une réponse acceptée : 1,2,3,4 ou 5")
+		a = str(input(BOLD + BLUE + ">>> (Custom Scan) "))
+		print(RESET, end='')
+	return a
+
+def verif_cible (a) :
+	x = isinstance(a, str)
+	while x != True :
+		print("Veuillez saisir une chaîne de caractères !")
+		a = str(input(BOLD + BLUE + ">>> (Custom Scan) "))
+		print(RESET, end='')
+		x = isinstance(a, str)
+	return x
+
+def verif_choix_shodan_domain (a) :
+	while a != "1" and a != "2" and a != "3" and a != "4" :
+		print("Veuillez saisir une réponse acceptée : 1,2,3,4 ou 5")
+		a = str(input(BOLD + BLUE + ">>> (Custom Scan) "))
+		print(RESET, end='')
+	return a
+
+def verif_choice_dnscan (a) :
+	while a != "1" and a != "2" :
+		print("Veuillez sélectionner l'une des deux options qui vous est offert par le chiffre indiqué : 1 ou 2")
 		a = str(input(BOLD + BLUE + ">>> (Custom Scan) "))
 		print(RESET, end='')
 	return a
@@ -238,9 +268,7 @@ while Rps != "q" :
 		Rps = str(input(BOLD + BLUE + ">>> (Default Scan) "))
 		print(RESET, end='')
 		domain = verif_domain_harvester(Rps) # On vérifie que le nom de domaine entré est valide.
-		results = os.popen("theHarvester -d " + domain + " " + "-b all > OutputHarvester").read()# On lance le scan avec le nom de domaine donné par l'utilisateur. On récupère l'intégralité de la sortie dans un fichier.
-		#Ci-dessous il faudrat appeler la fonction 'tri_result_harvester' pour trier le fichier de résultat et peut être faire un affichage plus propre.
-		#on lui demande l'adresse
+		results = os.popen("theHarvester -d " + domain + " " + "-b all > OutputHarvester").read()#On lance le scan avec le nom de domaine donné par l'utilisateur.
 		print("Veuillez patienter quelque seconde...")
 		# Trier les résultats
 		results_list = results.split("\n")
@@ -301,9 +329,14 @@ while Rps != "q" :
 		time.sleep(22) # On fige le code pendant 22 secondes pour atteindre que le scan soit terminé
 		# et que le résulat puisse être récupéré.
 		os.system("curl https://urlscan.io/api/v1/result/" + uuid + "/ > OutputURLScan.json")#On récupère le résultat du scan dans un fichier.
-		#On stocke le fichier de sortie dans un tableau en attendant
+		#On va convertir le fichier de sortie en yaml pour que ce soit plus simple à trier.
+		with open('OutputURLScan.json', 'r') as file:
+			configuration = json.load(file)
 
+		with open('OutputURLScan.yaml', 'w') as yaml_file:
+			yaml.dump(configuration, yaml_file)
 		
+
 		os.system("mkdir DefaultScanResult/")
 		os.system("chmod -R 700 DefaultScanResult/")
 		if Rps2 == "1":
@@ -311,7 +344,8 @@ while Rps != "q" :
 		elif Rps2 == "2":
 			os.system("mv OutputShodanDomain DefaultScanResult/")
 
-		os.system("mv OutputHarvester DefaultScanResult/")
+		os.system("mv DefaultScanTheHarvester.txt DefaultScanResult/")
+		os.system("rm OutputHarvester")
 		os.system("mv OutputDNScan DefaultScanResult/")
 		os.system("rm ResultURLScanIo.txt")
 		
@@ -330,6 +364,8 @@ while Rps != "q" :
 
 	#L'utilisateur peut choisir un outil ou un autre 
 	if Rps == "2" :
+
+		os.system("mkdir CustomScanOutput/")
 
 		print("Avant de démarrer il est important de préciser que cette partie ne vous expliquera pas le fonctionnement de chaque outil !")
 		print("Il est de votre fait de vous renseigner sur chaque outil avant d'utiliser cette partie du script !")
@@ -427,7 +463,7 @@ while Rps != "q" :
 			yaml.dump(service, dump_file)
 
 		print("\n")
-		print(RESET + "Maintenant que vous avez choisi vos outils, nous allons vous demandez les différentes options que vous souhaitez utiliser avec vos outils !")
+		print(RESET + "Maintenant que vous avez choisi vos outils, nous allons vous demandez les différentes options que vous souhaitez utiliser avec ces derniers !")
 		print(RESET + "Allons-y !")
 		print("\n")
 
@@ -435,7 +471,32 @@ while Rps != "q" :
 			service = yaml.safe_load(file)
 		
 		if service['Dnscan'] == 'Vraie' :
-			print()
+			print("Vous allez paramétrer DnScan !")
+			print("DnsScan peut fonctionner soit avec un seul domaine soit avec une liste de domaine !")
+			print("Votre premier choix va être de choisir entre une liste de domaine à scanner ou un seul !")
+			print(RED + "ATTENTION : Si vous voulez attaquer plusieurs domaines, ces derniers doivent se trouver dans un fichier avec un domaine par ligne.")
+			print(RED + "Si vous ne savez pas manipuler cette option le script ne fonctionnera pas ! Renseignez-vous au préalable.")
+			print(RED + "Il faut placer le fichier contenant tous les domaines à la racine du script pour que ça fonctionne !")
+			print(RESET, end='')
+			print("="*50)
+			print("1. Un seul domaine")
+			print("2. Plusieurs domaines")
+			print("="*50)
+			choix = str(input(BOLD + BLUE + ">>> (Custom Scan) "))
+			print(RESET, end='')
+			verification = verif_choice_dnscan(choix)
+
+			if verification == "1" :
+				print("Nous allons donc scanner un seul domaine.")
+				print("Voici les options qui sont à votre disposition.")
+				print("="*50)
+				print("="*50)
+
+			if verification == "2" :
+				print("Nous allons donc scanner une liste de domaine.")
+				print("Voici les options qui sont à votre disposition.")
+				print("="*50)
+				print("="*50)
 		
 		if service['Harvester'] == 'Vraie' :
 			print("Vous allez paramétrer theHarvester !")
@@ -504,9 +565,10 @@ while Rps != "q" :
 				# Afficher les résultats triés
 				for result in results_list:
 					print(result)
-					with open("ResultatTheHarvester.txt","w") as file :
+					with open("ResultatTheHarvesterCustomScan.txt","w") as file :
 						file.write(results)
 				print("Les résulats sont enregistrés dans le fichier ResultatTheHArvester.txt qui sera stocké dans le dossier CustomScanOutput")
+				os.system("mv ResultatTheHarvesterCustomScan.txt CustomScanOutput/")
 			input("Appuyez sur Entree pour continuer...")
 
 		if service['shodan'] == 'Vraie' :
@@ -516,21 +578,142 @@ while Rps != "q" :
 			print("Veuillez indiquer la cible que vous voulez scaner ! Exemple IP : 8.8.8.8 ; Exemple domaine : www.test.fr")
 			Souhait = str(input(BOLD + BLUE + ">>> (Custom Scan) "))
 			print(RESET, end='')
+			Souhait.rstrip("\n")
 			verif_souhait = verif_souhait_shodan(Souhait)
 
 			if verif_souhait.count(".") == 3 :
 				print("Vous avez décidé de scaner une IP.")
 				print("Voila ce que nous vous proposons d'effectuer sur une IP.")
 				print("="*50)
-				print("1. Honeypot - Permet de savoir si la cible est un pot de miel")
-				print("2. ")
+				print("1. Honeypot - Permet de savoir si la cible est un pot de miel.")
+				print("2. Host - Avoir toutes les informations disponibles sur une adresse IP.")
+				print("3. MyIP - Permet d'afficher votre IP publique.")
+				print("4. Search - Permet de faire une recherche dans la base de données Shodan.")
+				print("5. Commande - Choisir la commande que vous souhaitez exécuter.")
 				print("="*50)
+				Choix = str(input(BOLD + BLUE + ">>> (Custom Scan) "))
+				print(RESET, end='')
+				Choix.rstrip("\n")
+				verif_choix = verif_choix_shodan_IP(Choix)
+				if verif_choix == "1" :
+					print("Nous allons maintenant scaner l'adresse IP choisie pour voir si c'est un pot de miel ou non.")
+					print("L'intégralité des résultats récupérés seront stockés dans un fichier récupérable dans le répertoire CustomScanOutput")
+					print(RED + "Le HoneyPot est une option qui n'est pas totalement aboutie, il est possible que cette dernière ne fonctionne pas à tous les coups !!")
+					print(RESET, end='')
+					os.system("shodan honeyscore " + verif_souhait + " > OutputShodanHoneyPot")
+					print("Le scan est terminé !")
+					os.system("mv OutputShodanHoneyPot CustomScanOutput/ ")
+					input("Appuyer pour continuer....")
+
+				if verif_choix == "2" :
+					print("Nous allons maintenant scaner l'adresse IP choisie pour obtenir toutes les informations disponible à son sujet.")
+					print("L'intégralité des résultats récupérés seront stockés dans un fichier récupérable dans le répertoire CustomScanOutput")
+					os.system("shodan host " + verif_souhait + " > OutputShodanHost")
+					print("Le scan est terminé !")
+					os.system("mv OutputShodanHost CustomScanOutput/ ")
+					input("Appuyer pour continuer....")
+
+				if verif_choix == "3" :
+					print("Cette option permet simplement de récupérer votre adresse IP publique")
+					print("Nous n'allons donc pas utiliser la cible que vous avez renseigné ci-dessus.")
+					print("L'intégralité des résultats récupérés seront stockés dans un fichier récupérable dans le répertoire CustomScanOutput")
+					os.system("shodan myip > OutputShodanMyPublicIP")
+					print("Le scan est terminé !")
+					os.system("mv OutputShodanMyPublicIP CustomScanOutput/ ")
+					input("Appuyer pour continuer....")
+
+				if verif_choix == "4" :
+					print("Nous allons réaliser une recherche dans la bases de données Shodan.")
+					print("Nous n'allons pas utiliser la cible que vous avez donnée ci-dessus.")
+					print("Pour effecetuer cette recherche, nous allons avoir besoin d'un élément à chercher.")
+					print("L'intégralité des résultats récupérés seront stockés dans un fichier récupérable dans le répertoire CustomScanOutput")
+					print("Dans notre recherche nous allons utiliser des filtres pour avoir l'IP, le port, l'organisme, et le nom d'hôte.")
+					print(RED + "Le choix de la cible vous appartient seulement si vous utilisez une mauvaise cible, le résultat du scan sera forcément erroné.")
+					print(RESET, end = '')
+					cible = str(input(BOLD + BLUE + ">>> (Custom Scan) "))
+					print(RESET, end='')
+					cible.rstrip("\n")
+				
+					if verif_cible(cible) == True : 
+						os.system("shodan search --fields ip_str,port,org,hostnames " + cible + " > OutputShodanSearch")
+
+					print("Le scan est terminé !")
+					os.system("mv OutputShodanSearch CustomScanOutput/ ")
+					input("Appuyer pour continuer....")
+
+				if verif_choix == "5" :
+					print("Vous êtes libre de choisir la commande que vous voulez utiliser")
+					print("L'intégralité des résultats récupérés seront stockés dans un fichier récupérable dans le répertoire CustomScanOutput")
+					print(RED + "Aucune indication ne vous sera donnée, si la commande n'est pas bonne, le fichier de sortie affichera l'erreur !")
+					print(RESET, end='')
+					commande = str(input(BOLD + BLUE + ">>> (Custom Scan) "))
+					print(RESET, end='')
+					commande.rstrip("\n")
+					os.system(commande + " > OutputShodanFreeCommand")
+					print("Le scan est terminé !")
+					os.system("mv OutputShodanFreeCommand CustomScanOutput/ ")
+					input("Appuyer pour continuer....")
+
 			if verif_souhait.count(".") == 2 :
 				print("Vous avez décidé de scaner un domaine.")
 				print("Voila ce que nous vous proposons d'effectuer sur un domaine.")
 				print("="*50)
-
+				print("1. Domain - Avoir toutes les informations disponibles sur un nom de domaine.")
+				print("2. MyIP - Permet d'afficher votre IP public.")
+				print("3. Search - Permet de faire une recherche dans la base de données Shodan.")
+				print("4. Commande - Choisir la commande que vous souhaitez exécuter.")
 				print("="*50)
+				Choix = str(input(BOLD + BLUE + ">>> (Custom Scan) "))
+				print(RESET, end='')
+				Choix.rstrip("\n")
+				verif_choix_ = verif_choix_shodan_domain(Choix)
+				if verif_choix_ == "1" :
+					print("Nous allons scanner le domaine cible que nous avons récupéré ci-dessus.")
+					print("Ce scan va permettre de récupérer toutes les infos relatives à la cible choisie")
+					os.system("shodan domain " + verif_souhait + " > OutputShodanDomain")
+					print("Le scan est terminé !")
+					os.system("mv OutputShodanDomain CustomScanOutput/ ")
+					input("Appuyer pour continuer....")
+
+				if verif_choix_ == "2" : 
+					print("Nous n'allons pas vraiment exécuter de scan dans cette situation.")
+					print("Nous allons simplement récupérer votre IP public")
+					os.system("shodan myip > OutputShodanPublicIP")
+					print("L' IP a été récupérée")
+					os.system("mv OutputShodanPublicIP CustomScanOutput/ ")
+					input("Appuyer pour continuer....")
+
+				if verif_choix_ == "3" :
+					print("Nous allons réaliser une recherche dans la bases de données Shodan.")
+					print("Nous n'allons pas utiliser la cible que vous avez donnée ci-dessus.")
+					print("Pour effecetuer cette recherche, nous allons avoir besoin d'un élément à chercher.")
+					print("L'intégralité des résultats récupérés seront stockés dans un fichier récupérable dans le répertoire CustomScanOutput")
+					print("Dans notre recherche nous allons utiliser des filtres pour avoir l'IP, le port, l'organisme, et le nom d'hôte.")
+					print(RED + "Le choix de la cible vous appartient seulement si vous utilisez une mauvaise cible, le résultat du scan sera forcément erroné.")
+					print(RESET, end = '')
+					cible = str(input(BOLD + BLUE + ">>> (Custom Scan) "))
+					print(RESET, end='')
+					cible.rstrip("\n")
+				
+					if verif_cible(cible) == True : 
+						os.system("shodan search --fields ip_str,port,org,hostnames " + cible + " > OutputShodanSearch")
+
+					print("Le scan est terminé !")
+					os.system("mv OutputShodanSearch CustomScanOutput/ ")
+					input("Appuyer pour continuer....")
+
+				if verif_choix_ == "4" :
+					print("Vous êtes libre de choisir la commande que vous voulez utiliser")
+					print("L'intégralité des résultats récupérés seront stockés dans un fichier récupérable dans le répertoire CustomScanOutput")
+					print(RED + "Aucune indication ne vous sera donnée, si la commande n'est pas bonne, le fichier de sortie affichera l'erreur !")
+					print(RESET, end='')
+					commande = str(input(BOLD + BLUE + ">>> (Custom Scan) "))
+					print(RESET, end='')
+					commande.rstrip("\n")
+					os.system(commande + " > OutputShodanFreeCommand")
+					print("Le scan est terminé !")
+					os.system("mv OutputShodanFreeCommand CustomScanOutput/ ")
+					input("Appuyer pour continuer....")
 
 		if service['urlscan'] == 'Vraie' :
 			print()
@@ -538,36 +721,31 @@ while Rps != "q" :
 
 
 
-
-
-
-
-
-		while Rps != "q" :
+		# while Rps != "q" :
 		
-			if (Rps == "A" or Rps == "a") :
-				print("blabla")
+		# 	if (Rps == "A" or Rps == "a") :
+		# 		print("blabla")
 				
-			if (Rps == "B" or Rps == "b") :
-				print("blabla")
+		# 	if (Rps == "B" or Rps == "b") :
+		# 		print("blabla")
 			
-			if (Rps == "C" or Rps == "c") :
-				print("blabla")
+		# 	if (Rps == "C" or Rps == "c") :
+		# 		print("blabla")
 				
-			if (Rps == "D" or Rps == "d") :
-				print("blabla")
+		# 	if (Rps == "D" or Rps == "d") :
+		# 		print("blabla")
 	
       #Si l'utilisateur est con ou s'il rentre une mauvaise commande
-			if(Rps != "A" and Rps != "B" and Rps != "C" and Rps != "D" and Rps != "a" and Rps != "b" and Rps != "c" and Rps != "d") :
-				print(RED + BOLD + "La commande que vous avez saisie n'existe pas" + RESET)		
+			# if(Rps != "A" and Rps != "B" and Rps != "C" and Rps != "D" and Rps != "a" and Rps != "b" and Rps != "c" and Rps != "d") :
+			# 	print(RED + BOLD + "La commande que vous avez saisie n'existe pas" + RESET)		
 		
-			Rps = str(input(BOLD + BLUE + ">>> (Custom scan) "))
-			print(RESET, end = '')
+			# Rps = str(input(BOLD + BLUE + ">>> (Custom scan) "))
+			# print(RESET, end = '')
 		
 	#Help, cela affiche le menu
 	if Rps == "h" :
 		FirstSummary()
-	#Si l'utilisateur est con ou s'il rentre une mauvaise commande
+	#Si l'utilisateur rentre une mauvaise commande
 	if(Rps != "1" and Rps != "2" and Rps != "3" and Rps != "4" and Rps != "h") :
 		print(RED + BOLD + "La commande que vous avez saisie n'existe pas" + RESET)
 
