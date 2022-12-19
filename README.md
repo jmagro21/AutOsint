@@ -6,8 +6,15 @@ Ces outils récupèrent des adresses IP's, des noms de domaine, des adresses mai
 
 - Quelques recommandations avant de démarrer la lecture des informations suivantes et l'exécution du script.
         - Vous devez exécuter ce script dans une machine linux. (Version recommandée : Kali Linux)
+        
         - Lorsque vous récuprérer le dossier contenant tout ce qui est nécessaire au script pour s'éxecuter, il est nécessaire d'exécuter le script avec l'utilisateur            root.
-        - L'intégralité des droits doivent être attribués à l'utilisateur root mais rien aux autres. (Exemple : chmod -R 700                            Nom_du_dossier_qui_contient_les_fichiers_du_script)
+        
+        - L'intégralité des droits doivent être attribués à l'utilisateur root mais rien aux autres. (Exemple : chmod -R 700                                                       Nom_du_dossier_qui_contient_les_fichiers_du_script)
+          
+          
+          
+          
+          
           
 Dans ce readme vous allez retrouver des informations 
 - Dnsscan - récupération passive d'information liées au DNS
