@@ -54,7 +54,7 @@ Dans ce readme vous allez retrouver des informations concernants les outils que 
             ```
             $ dnscan.py -d dev-%%.example.org
             ```
-           
+            
         - Shodan est un outil permettant de récupérer, en fonction de l'ip ou du nom de domaine, des informations sur la cible (utilisable via
           l'api ou l'outil en ligne de commande). Toutes les informations complémentaires à cet outil peuvent être retrouvé à ce lien : https://developer.shodan.io/api
           Il est également possible d'utiliser cet outil sous forme de paquet installable sur la distribution Linux de votre choix. C'est d'ailleurs cette méthode que           nous allons utiliser dans notre script.
@@ -63,5 +63,12 @@ Dans ce readme vous allez retrouver des informations concernants les outils que 
         - TheHarvester permet de récupérer des informations sur un nom de domaine ou une IP. Les informations collectés peuvent être diverse : Nom de serveur, adresse           IP, adresses mail, etc...
           Dans notre situation, nous utilisons l'outil qui s'installe comme un paquet classique. Si vous désirez plus d'informations à son sujet, vous pouvez consulter           le code pour en apprendre davantage sur cet outil ou vous pouvez consulter ces différents liens : 
                  - https://www.padawanhacker.fr/tests-d-intrusion/collecte-d-information-passive/the-harvester
-                 - 
-        - [Urlscan.io](https://urlscan.io/docs/api/) - réalise un scan d'une cible et récupère des informations.
+                 - https://www.kali.org/tools/theharvester/
+                 
+        - Urlscan.io - Cet outil permet de réaliser un scan d'une cible et récupérer toutes les informations disponibles sur cette dernière. Cet outil s'utilie sous             forme d'API que l'on interroge pour scanner une cible mais également récupérer le résultat d'un scan. En effet, ce n'est pas le script qui exécute le scan             mais bien l'API. Il faut ensuite interroger l'API Urlscan.io pour récupérer le résultat du scan.
+          Pour plus d'informations vous pouvez consulter la documentation de l'API officiel par le lien suivant : https://urlscan.io/docs/api/
+          Cette API nécessite de comprendre comment cette dernière fonctionne pour pouvoir l'utiliser correctement.
+          
+          
+          Il est donc tous les cas vivement conseiller avant de lancer le script pour la première fois d'avoir pris connaissances des différents outils que vous allez           utiliser. 
+          Après tout cela, il est enfin temps de s'amuser :)
