@@ -1,6 +1,7 @@
-Projet Scolaire :
+Projet Scolaire : AUTOSINT
 
-Création d'un script Python pour automatiser Osint sur internet.
+Script Python permettant d'automatiser les 4 outils suivants : Shodan, TheHarvester, Dnscan et URLscan.io.
+Ces outils sont très puissants et permettent de faire des recherches publiques (en libre accès) sur des noms de domaine, des IP's et des lites de domaines.
 
 Automatiser les outils suivants :
 - Dnsscan - récupération passive d'information liées au DNS
