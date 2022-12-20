@@ -72,3 +72,22 @@ Dans ce readme vous allez retrouver des informations concernants les outils que 
           
           Il est donc tous les cas vivement conseiller avant de lancer le script pour la première fois d'avoir pris connaissances des différents outils que vous allez           utiliser. 
           Après tout cela, il est enfin temps de s'amuser :)
+ 
+
+######
+DOCKER
+######
+
+        - Pour utiliser le dockerfile il faut se rendre dans le dossier "Python_Docker" et exécuter la commande suivante pour construire l'image du conteneur : 
+                
+                docker build -t autosint .
+                
+        - Pour vérifier que la commande a bien fonctionnée, vous pouvez taper la commande suivante : 
+        
+                docker images
+                
+        - Maintenant que le conteneur est construit, on va le lancer avec la commande suivante et il est très important qu'il soit lancer avec la commande suivante :
+        
+                docker run -ti -v $(pwd):/var/www/ autosint
+                
+          On utilise cette commande car elle nous permet de récupérer les résultats des scans effectués dans le conteneur dans le répertoire courant.
