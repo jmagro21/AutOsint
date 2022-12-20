@@ -4,6 +4,7 @@ import requests # Module qui va permettre de faire des requêtes à l'API URLsca
 import json # Module permettant de manipuler des fichiers json. (proche du XML)
 import time # Nécessaire pour faire attendre le code quelques secondes pour récupérer le résultat de URLSCAN
 import yaml # On importe le module yaml pour manipuler les fichier du même nom.
+import csv #On importe csv dont nous allons nous servir par la suite avec URLscan.io
 # Installation de tous les paquets nécessaires au script dans un autre fichier pour être sûr et certain que la machine va être capable de lire le script.
 
 BOLD = '\033[1m' # Code couleur qui nous permet de rendre le script un peu plus joli
@@ -135,6 +136,8 @@ def verif_urlscan_lien(a) :
 		a = str(input(BOLD + BLUE + ">>> (Default Scan) "))
 		print(RESET, end='')
 		nb = a.count(".")
+		nb1 = a.count("/")
+		nb2 = a.count(":")
 	return a
 
 def FirstSummary () :
@@ -215,6 +218,50 @@ def verif_choice_dnscan (a) :
 		print(RESET, end='')
 	return a
 
+def verif_option_dnscan (a):
+	while a != "1" and a != "2" and a != "3" and a != "4" and a != "5" and a != "6":
+		print("Veuillez choisir une des options qui est mises à votre disposition !")
+		a = str(input(BOLD + BLUE + ">>> (Custom Scan) "))
+		print(RESET, end='')
+	return a
+
+def verif_list_dnscan(a):
+	while a != "subdomains.txt" and a != "subdomains-100.txt" and a != "subdomains-500.txt" and a != "subdomains-1000.txt" and a != "subdomains-10000.txt" and a != "subdomains-uk-500.txt" and a != "subdomains-uk-1000.txt" :
+		print("Veuillez saisir un nom de fichier acceptable parmi ceux qui vous sont proposés.")
+		a = str(input(BOLD + BLUE + ">>> (Custom Scan) "))
+		print(RESET, end='')
+	return a
+
+def verif_resolver_dnscan(a):
+	nb = a.count(".")
+	while nb != 3 :
+		print("Veuillez saisir une adresse IP ! Exemple : 8.8.8.8")
+		a = str(input(BLUE + BOLD + ">>> (Custom Scan) "))
+		print(RESET, end='')
+		nb = a.count(".")
+	return a
+
+def verif_fin_choix(a):
+	while a != "1" and a != "2" :
+		print("Veuillez choisir une option autorisée ! 1 ou 2")
+		a = str(input(BOLD + BLUE + ">>> "))
+		print(RESET, end='')
+	return a
+
+def choix_fin_default_scan(a):
+	while a != "q" and a != "h" :
+		print("Veuillez sélectionner une option valide ! q ou h")
+		a = str(input(BOLD + BLUE + ">>> "))
+		print(RESET, end='')
+	return a
+
+def verif_option_resultat(a) :
+	while a != "1" and a != "2" and a != "3" :
+		print("Veuillez saisir une réponse autorisée ! Exemple : 1, 2 ou 3")
+		a = str(input(BOLD + BLUE + ">>> (Custom Scan) "))
+		print(RESET, end='')
+	return a
+
 #Affichage de ma baniere
 titre = pyfiglet.figlet_format("AutOsint", font = "slant" )
 print(titre)
@@ -268,17 +315,8 @@ while Rps != "q" :
 		Rps = str(input(BOLD + BLUE + ">>> (Default Scan) "))
 		print(RESET, end='')
 		domain = verif_domain_harvester(Rps) # On vérifie que le nom de domaine entré est valide.
-		results = os.popen("theHarvester -d " + domain + " " + "-b all > OutputHarvester").read()#On lance le scan avec le nom de domaine donné par l'utilisateur.
-		print("Veuillez patienter quelque seconde...")
-		# Trier les résultats
-		results_list = results.split("\n")
-		results_list = [result for result in results_list if result]  # retirer les éléments vides
-		results_list.sort()
-		# Afficher les résultats triés
-		for result in results_list:
-			print(result)
-			with open("DefaultScanTheHarvester.txt","w") as file :
-				file.write(results)
+		os.system("theHarvester -d " + domain + " " + "-b all > OutputHarvester")#On lance le scan avec le nom de domaine donné par l'utilisateur.
+		
 
 		print("\n")
 
@@ -335,7 +373,6 @@ while Rps != "q" :
 
 		with open('OutputURLScan.yaml', 'w') as yaml_file:
 			yaml.dump(configuration, yaml_file)
-		
 
 		os.system("mkdir DefaultScanResult/")
 		os.system("chmod -R 700 DefaultScanResult/")
@@ -344,13 +381,14 @@ while Rps != "q" :
 		elif Rps2 == "2":
 			os.system("mv OutputShodanDomain DefaultScanResult/")
 
-		os.system("mv DefaultScanTheHarvester.txt DefaultScanResult/")
-		os.system("rm OutputHarvester")
+		os.system("mv OutputHarvester DefaultScanResult/")
 		os.system("mv OutputDNScan DefaultScanResult/")
 		os.system("rm ResultURLScanIo.txt")
+		os.system("mv OutputURLScan.yaml DefaultScanResult/")
+		os.system("mv OutputURLScan.json DefaultScanResult/")
 		
 		print("Nous avons exécuter l'ensemble des outils avec les paramètres par défaut !")
-		print("Vous pouvez retrouver l'ensemble des résultats dans le fichier DefaultScanResult \n")
+		print("Vous pouvez retrouver l'ensemble des résultats dans le dossier DefaultScanResult \n")
 		print("Voulez-vous continuer le script ou quitter ce dernier ?")
 		print("="*50)
 		print("q. Quitter le script ")
@@ -358,9 +396,15 @@ while Rps != "q" :
 		print("="*50)
 		Rps = str(input(BOLD + BLUE + ">>> (Default Scan) "))
 		print(RESET, end='')
+		VERIF = choix_fin_default_scan(Rps)
 
-		if Rps == "q" or Rps == "Q" :
-			exit()
+		if VERIF == "q" :
+			exit() # Petite fonction plus propre.
+		
+		if VERIF == "h" :
+			FirstSummary()
+			Rps = str(input(BOLD + BLUE + ">>> "))
+			print(RESET, end='')
 
 	#L'utilisateur peut choisir un outil ou un autre 
 	if Rps == "2" :
@@ -392,7 +436,6 @@ while Rps != "q" :
 		elif Tools1 == "q" :
 			exit()
 
-		print("\n")
 	
 		autre_outil()
 		Autre_outil = str(input(BOLD + BLUE + ">>> (Custom Scan) "))
@@ -457,16 +500,13 @@ while Rps != "q" :
 		else :
 			print("\0")
 		
-		print("\n")
 
 		with open('config.yml', 'w') as dump_file :
 			yaml.dump(service, dump_file)
 
-		print("\n")
 		print(RESET + "Maintenant que vous avez choisi vos outils, nous allons vous demandez les différentes options que vous souhaitez utiliser avec ces derniers !")
 		print(RESET + "Allons-y !")
-		print("\n")
-
+		
 		with open('config.yml', 'r') as file :
 			service = yaml.safe_load(file)
 		
@@ -488,16 +528,162 @@ while Rps != "q" :
 
 			if verification == "1" :
 				print("Nous allons donc scanner un seul domaine.")
-				print("Voici les options qui sont à votre disposition.")
+				print("Veuillez indiquer la cible que vous voulez scanner. Exemple : www.le-pointcom.fr")
+				cible = str(input(BOLD + BLUE + ">>> (Custom Scan) "))
+				print(RESET, end='')
+				verification_cible = verif_domain_dnscan(cible)
+				print("Maintenant que nous avons la cible, voici les options qui sont à votre disposition.")
 				print("="*50)
+				print("1. Domain - Récupérer toutes les informations liées à un domaine.") #python3 dnscan.py -d " + domaine + " -o OutputDNScan
+				print("2. IP - Récupère toutes les IP découvertes dans un fichier texte !")
+				print("3. Quick - Permet de réaliser un scan rapide.")
+				print("4. No IP - Ne pas afficher les adresses IP dans le fichier de résultat.")
+				print("5. Resolver - Utiliser un autre service DNS que celui du système.")
+				print("6. Commande libre - Utiliser la commande que vous voulez.")
 				print("="*50)
+				option = str(input(BOLD + BLUE + ">>> (Custom Scan) "))
+				print(RESET, end='')
+				verif_option = verif_option_dnscan(option)
+
+				if verif_option == "1":
+					print("Nous allons scanner le domaine sélectionné")
+					os.system("python3 dnscan.py -d " + verification_cible + " -o OutputDNScanDomain")
+					print("Le scan est terminé !")
+					os.system("mv OutputDNScanDomain CustomScanOutput/")
+					input("Appuyer pour continuer....")
+				
+				if verif_option == "2":
+					print("Nous allons récupérer toutes les IPs liées à un domaine.")
+					os.system("python3 dnscan.py -d " + verification_cible + " -i DNScanRetrieveIPs -o OutputDNScanDomain")
+					print("Le scan est terminé !")
+					os.system("mv DNScanRetrieveIPs CustomScanOutput/")
+					os.system("mv OutputDNScanDomain CustomScanOutput/")
+					input("Appuyer pour continuer....")				
+
+				if verif_option == "3":
+					print("Nous allons réaliser un scan rapide de la cible choisie.")
+					os.system("python3 dnscan.py -d " + verification_cible + " -q -o OutputDNScanQuick")
+					print("Le scan est terminé !")
+					os.system("mv OutputDNScanQuick CustomScanOutput/")
+					input("Appuyer pour continuer....")
+				
+				if verif_option == "4":
+					print("Un scan normal va être effectué, cependant les adresses Ip ne seront pas afficher dans la sortie obtenue.")
+					os.system("python3 dnscan.py -d " + verification_cible + " -N -o OutputDNScanNOIP")
+					print("Le scan est terminé !")
+					os.system("mv OutputDNScanNOIP CustomScanOutput/")
+					input("Appuyer pour continuer....")
+
+				if verif_option == "5":
+					print("Nous allons utiliser un autre service DNS que celui du système.")
+					print("Indiquer le service que vous voulez utiliser.")
+					print(RED + "ATTENTION : Le service DNS choisit doit être donné sous forme d'adresse IP.")
+					print(RESET, end='')
+					resolver = str(input(BOLD + BLUE + ">>> (Custom Scan) "))
+					print(RESET, end='')
+					resolver.rstrip("\n")
+					verif_resolver = verif_resolver_dnscan(resolver)
+					print("Nous allons maintenant passer à l'éxecution du scan.")
+					os.system("python3 dnscan.py -d " + verification_cible + " -R " + verif_resolver + " -o OutputDNScanResolver")
+					print("Le scan est terminé !")
+					os.system("mv OutputDNScanResolver CustomScanOutput/")
+					input("Appuyer pour continuer....")
+
+				if verif_option == "6":
+					print("Vous avez donc le choix de la commande à utiliser.")
+					print(RED + "ATTENTION : Si la commande que vous renseigner n'est pas bonne, cela engendrera une erreur !")
+					print(RED + "Il est consigné de se renseigner au préalable avant d'utiliser cette option !")
+					print(RED + "Ne pas utiliser l'option de sortie dans un fichier ! Nous nous occupons de tout !")
+					print(RESET, end='')
+					commande_user = str(input(BOLD + BLUE + ">>> (Custom Scan) "))
+					print(RESET, end='')
+					print("Le scan va commencer !")
+					os.system(commande_user + " > OutputDNScanFreeCommand")
+					print("Le scan est terminé !")
+					os.system("mv OutputDNScanFreeCommand CustomScanOutput/")
+					input("Appuyer pour continuer....")
 
 			if verification == "2" :
 				print("Nous allons donc scanner une liste de domaine.")
+				print("Plusieurs fichiers contenant des domaines sont fournis pas l'outil par défaut.")
+				print("Ces fichiers sont les suivants et vous pouvez les utiliser : subdomains.txt, subdomains-100.txt, subdomains-500.txt, subdomains-1000.txt, subdomains-10000.txt, subdomains-uk-500.txt, subdomains-uk-1000.txt")
+				print(RED + "Le service de scan de list peut rencontrer des problèmes durant l'exécution. Cela peut arriver quand le service dns est surchargé !")
+				print(RESET, end='')
+				print("Veuillez saisir le nom de la liste que vous souhaiez utiliser ! Seul les listes fournies par DnsScan")
+				cible = str(input(BOLD + BLUE + ">>> (Custom Scan) "))
+				print(RESET, end='')
+				verif_list = verif_list_dnscan(cible)
 				print("Voici les options qui sont à votre disposition.")
 				print("="*50)
+				print("1. List - Permet de récupérer toutes les informations liées à une liste de domaine.")
+				print("2. IP - Récupère toutes les IP découvertes dans un fichier texte !")
+				print("3. Quick - Permet de réaliser un scan rapide.")
+				print("4. No IP - Ne pas afficher les adresses IP dans le fichier de résultat.")
+				print("5. Resolver - Utiliser un autre service DNS que celui du système.")
+				print("6. Commande libre - Utiliser la commande que vous voulez.")
 				print("="*50)
-		
+				option = str(input(BOLD + BLUE + ">>> (Custom Scan) "))
+				print(RESET, end='')
+				verif_option = verif_option_dnscan(option)
+
+				if verif_option == "1":
+					print("Nous allons donc récupérer toutes les informations liées à la liste de domaines.")
+					os.system("python3 dnscan.py -l " + verif_list + " -o OutputDNScanList")
+					print("Le scan est terminé !")
+					os.system("mv OutputDNScanList CustomScanOutput/")
+					input("Appuyer pour continuer....")
+				
+				if verif_option == "2":
+					print("Nous allons récupérer toutes les IPs liées à la liste de domaine.")
+					os.system("python3 dnscan.py -l " + verif_list + " -i DNScanRetrieveIPs -o OutputDNScanList")
+					print("Le scan est terminé !")
+					os.system("mv DNScanRetrieveIPs CustomScanOutput/")
+					os.system("mv OutputDNScanList CustomScanOutput/")
+					input("Appuyer pour continuer....")
+				
+				if verif_option == "3":
+					print("Nous allons réaliser un scan rapide de la cible choisie.")
+					os.system("python3 dnscan.py -l " + verif_list + " -q -o OutputDNScanListQuick")
+					print("Le scan est terminé !")
+					os.system("mv OutputDNScanListQuick CustomScanOutput/")
+					input("Appuyer pour continuer....")
+				
+				if verif_option == "4":
+					print("Un scan normal va être effectué, cependant les adresses Ip ne seront pas afficher dans la sortie obtenue.")
+					os.system("python3 dnscan.py -l " + verif_list + " -N -o OutputDNScanListNoIP")
+					print("Le scan est terminé !")
+					os.system("mv OutputDNScanListNoIP CustomScanOutput/")
+					input("Appuyer pour continuer....")
+
+				if verif_option == "5":
+					print("Nous allons utiliser un autre service DNS que celui du système.")
+					print("Indiquer le service que vous voulez utiliser.")
+					print(RED + "ATTENTION : Le service DNS choisit doit être donné sous forme d'adresse IP.")
+					print(RESET, end='')
+					resolver = str(input(BOLD + BLUE + ">>> (Custom Scan) "))
+					print(RESET, end='')
+					resolver.rstrip("\n")
+					verif_resolver = verif_resolver_dnscan(resolver)
+					print("Nous allons maintenant passer à l'éxecution du scan.")
+					os.system("python3 dnscan.py -l " + verif_list + " -R " + verif_resolver + " -o OutputDNScanListResolver")
+					print("Le scan est terminé !")
+					os.system("mv OutputDNScanListResolver CustomScanOutput/")
+					input("Appuyer pour continuer....")
+
+				if verif_option == "6":
+					print("Vous avez donc le choix de la commande à utiliser.")
+					print(RED + "ATTENTION : Si la commande que vous renseigner n'est pas bonne, cela engendrera une erreur !")
+					print(RED + "Il est consigné de se renseigner au préalable avant d'utiliser cette option !")
+					print(RED + "Ne pas utiliser l'option de sortie dans un fichier ! Nous nous occupons de tout !")
+					print(RESET, end='')
+					commande_user = str(input(BOLD + BLUE + ">>> (Custom Scan) "))
+					print(RESET, end='')
+					print("Le scan va commencer !")
+					os.system(commande_user + " > OutputDNScanFreeCommand")
+					print("Le scan est terminé !")
+					os.system("mv OutputDNScanListFreeCommand CustomScanOutput/")
+					input("Appuyer pour continuer....")
+
 		if service['Harvester'] == 'Vraie' :
 			print("Vous allez paramétrer theHarvester !")
 			end=" "
@@ -547,28 +733,17 @@ while Rps != "q" :
 			if Souhait == end : 
 				if Perso == "true" :
 					print("Veuillez patienter quelque seconde...")
-					results = os.popen(CommandHarvester).read()
+					os.system(CommandHarvester + " > OutputtheHarvesterCustom")
 				else : 
 					#on lui demande l'adresse
-					DNS = str(input(BOLD + BLUE + "veuillez saisir l'adresse DNS à Scanner ! Exemple : test.fr et pas www.test.fr"))
+					DNS = str(input(BOLD + BLUE + "veuillez saisir l'adresse DNS à Scanner ! Exemple : test.fr et pas www.test.fr : "))
 					print(RESET, end='')
 					#on fait tourner la command de façon non visible pour l'utilisateur
 					verif_DNS = verif_domain_harvester(DNS)
 					print("Veuillez patienter quelque seconde...")
-					results = os.popen("theHarvester -d "+verif_DNS+" -b "+Option1).read()
-
-				# Trier les résultats
-				results_list = results.split("\n")
-				results_list = [result for result in results_list if result]  # retirer les éléments vides
-				results_list.sort()
-
-				# Afficher les résultats triés
-				for result in results_list:
-					print(result)
-					with open("ResultatTheHarvesterCustomScan.txt","w") as file :
-						file.write(results)
-				print("Les résulats sont enregistrés dans le fichier ResultatTheHArvester.txt qui sera stocké dans le dossier CustomScanOutput")
-				os.system("mv ResultatTheHarvesterCustomScan.txt CustomScanOutput/")
+					os.system("theHarvester -d " + verif_DNS + " -b " + Option1 + " > OutputtheHarvesterCustom")
+				print("Les résulats sont enregistrés dans le fichier OutputtheHarvesterCustom qui sera stocké dans le dossier CustomScanOutput")
+				os.system("mv OutputtheHarvesterCustom CustomScanOutput/")
 			input("Appuyez sur Entree pour continuer...")
 
 		if service['shodan'] == 'Vraie' :
@@ -712,42 +887,138 @@ while Rps != "q" :
 					commande.rstrip("\n")
 					os.system(commande + " > OutputShodanFreeCommand")
 					print("Le scan est terminé !")
-					os.system("mv OutputShodanFreeCommand CustomScanOutput/ ")
+					os.system("mv OutputShodanFreeCommand CustomScanOutput/")
 					input("Appuyer pour continuer....")
 
 		if service['urlscan'] == 'Vraie' :
-			print()
+			print("Nous allons utiliser l'outil urlscan.io qui permet de récupérer des informations sur des URL")
+			print("Il vous suffit d'indiquer l'url que vous voulez scanner !")
+			print("Vous devez donner l'intégralité du lien !! Exemple : https://www.instagram.com/")
+			Rps = str(input(BOLD + BLUE + ">>> (Default Scan) "))
+			print(RESET, end='')
+			FQDN = verif_urlscan_lien(Rps)
+			headers = {'API-Key':'27a5f4bf-340a-47dd-a710-7a3038a97321','Content-Type':'application/json'}
+			data = {"url": Rps, "visibility": "public"}
+			response = requests.post('https://urlscan.io/api/v1/scan/',headers=headers, data=json.dumps(data))
 
+			os.system("touch ResultURLScanIo.txt")
+			fichier = open('ResultURLScanIo.txt', 'w')
+			for ligne in response :
+				fichier.write(str(ligne))
+			fichier.close()
+			#Extraction de l'UUID
+			lF = [] #liste tampon qui va accueillir le contenu du fichier
+			#On ouvre le fichier et on ajoute son contenu a la liste
+			fileInput = open("ResultURLScanIo.txt", "r")
+			lignes = fileInput.readlines()
+			for ligne in lignes :
+				lF.append(ligne)
+			fileInput.close()
 
+			texte = str(lF) #On convertie la liste en une string
+			#On cherche dans le fichier le mot uuid qui nous indique l'emplacement de celui-ci
+			emplUUID = texte.find("uuid") + 8 #emplacement de l'uuid
+			#uuid se trouve 4 caracteres apres "uuid", on ajoute la longueur du mot "uuid" ce qui fait 8.
+			#uuid fait 36 caracteres de long, par consequent 
+			uuid = texte[emplUUID : emplUUID + 36]
 
+			print("URLscan.io est un outil assez particulié.")	
+			print("Les options que vous allez voir sont des options pour récupérer des informations supplémentaires du résultat.")
+			print("Le scan est le même pour tous le monde MAIS on peut récupérer des informations particulières avec certaines requêtes.")
+			print("En sortie vous récupérerez un fichier json et yaml non trié.")
+			print("Veuillez indiquer les informations que vous voulez récupérer sur la cible en plus du résultat classique.")
+			print("="*50)
+			print("1. Image - Récupère une image PNG du domaine scanné.")
+			print("2. DOM Snapshot - Récupère une snapshot dom de la hiérarchie du domaine.")
+			print("3. Scan classique - Effectuer un scan classique.")
+			print("="*50)
+			option_resultat = str(input(BOLD + BLUE + ">>> (Custom Scan) "))
+			print(RESET, end='')
+			verif_option_ = verif_option_resultat(option_resultat)
 
-		# while Rps != "q" :
-		
-		# 	if (Rps == "A" or Rps == "a") :
-		# 		print("blabla")
+			if verif_option_ == "1" :
+				time.sleep(22)
+				os.system("curl https://urlscan.io/screenshots/" + uuid + ".png -o ImageURLscan.png")
+				os.system("curl https://urlscan.io/api/v1/result/" + uuid + "/ > OutputURLScan.json")
+				print("La récupération de l'image est terminée !")
+				os.system("mv ImageURLscan.png CustomScanOutput/")
+				with open('OutputURLScan.json', 'r') as file:
+					configuration = json.load(file)
+				with open('OutputURLScan.yaml', 'w') as yaml_file:
+					yaml.dump(configuration, yaml_file)
 				
-		# 	if (Rps == "B" or Rps == "b") :
-		# 		print("blabla")
-			
-		# 	if (Rps == "C" or Rps == "c") :
-		# 		print("blabla")
+				os.system("mv OutputURLScan.yaml CustomScanOutput/")
+				os.system("mv OutputURLScan.json CustomScanOutput/")
+				os.system("rm ResultURLScanIo.txt")
+				input("Appuyer pour continuer....")
+
+			if verif_option_ == "2" :
+				time.sleep(22)
+				os.system("curl https://urlscan.io/dom/" + uuid + "/ -o SnapshotDOMURLscan")
+				os.system("curl https://urlscan.io/api/v1/result/" + uuid + "/ > OutputURLScan.json")
+				print("La snapshot est récupérée !")
+				os.system("mv SnapshotDOMURLscan CustomScanOutput/")
+				with open('OutputURLScan.json', 'r') as file:
+					configuration = json.load(file)
+				with open('OutputURLScan.yaml', 'w') as yaml_file:
+					yaml.dump(configuration, yaml_file)
 				
-		# 	if (Rps == "D" or Rps == "d") :
-		# 		print("blabla")
-	
-      #Si l'utilisateur est con ou s'il rentre une mauvaise commande
-			# if(Rps != "A" and Rps != "B" and Rps != "C" and Rps != "D" and Rps != "a" and Rps != "b" and Rps != "c" and Rps != "d") :
-			# 	print(RED + BOLD + "La commande que vous avez saisie n'existe pas" + RESET)		
+				os.system("mv OutputURLScan.yaml CustomScanOutput/")
+				os.system("mv OutputURLScan.json CustomScanOutput/")
+				os.system("rm ResultURLScanIo.txt")
+				input("Appuyer pour continuer....")
+
+			if verif_option_ == "3" :
+				time.sleep(22) # On fige le code pendant 22 secondes pour atteindre que le scan soit terminé
+				# et que le résulat puisse être récupéré.
+				os.system("curl https://urlscan.io/api/v1/result/" + uuid + "/ > OutputURLScan.json")#On récupère le résultat du scan dans un fichier.
+				print("Le scan est terminé !")
+				#On va convertir le fichier de sortie en yaml pour que ce soit plus simple à trier.
+				with open('OutputURLScan.json', 'r') as file:
+					configuration = json.load(file)
+				with open('OutputURLScan.yaml', 'w') as yaml_file:
+					yaml.dump(configuration, yaml_file)
+				
+				os.system("mv OutputURLScan.json CustomScanOutput/")
+				os.system("mv OutputURLScan.yaml CustomScanOutput/")
+				os.system("rm ResultURLScanIo.txt")
+				input("Appuyer pour continuer....")
+
+		service['Dnscan'] = 'Faux'
+		service['urlscan'] = 'Faux'
+		service['shodan'] = 'Faux'
+		service['Harvester'] = 'Faux'
+
+		with open('config.yml', 'w') as dump_file :
+			yaml.dump(service, dump_file)
 		
-			# Rps = str(input(BOLD + BLUE + ">>> (Custom scan) "))
-			# print(RESET, end = '')
+		print("\n")
+		print("Les différents scans personnalisés sont terminés !")
+		print("Voulez-vous quitter le script ?")
+		print("="*50)
+		print("1. Oui")
+		print("2. Non, retourner au menu principal")
+		print("="*50)
+		fin = str(input(BOLD + BLUE + ">>> "))
+		print(RESET, end='')
+		verif_fin = verif_fin_choix(fin)
+
+		if verif_fin == "1" :
+			exit()
 		
+		if verif_fin == "2" :
+			FirstSummary()
+			Rps = str(input(BOLD + BLUE + ">>> "))
+			print(RESET, end='')
+
 	#Help, cela affiche le menu
-	if Rps == "h" :
+	while Rps == "h" :
 		FirstSummary()
-	#Si l'utilisateur rentre une mauvaise commande
-	if(Rps != "1" and Rps != "2" and Rps != "3" and Rps != "4" and Rps != "h") :
-		print(RED + BOLD + "La commande que vous avez saisie n'existe pas" + RESET)
+		Rps = str(input(BOLD + BLUE + ">>> "))
+		print(RESET, end='')
 
-	Rps = str(input(BOLD + BLUE + ">>> "))
-	print(RESET, end = '')
+	#Si l'utilisateur rentre une mauvaise commande
+	while (Rps != "1" and Rps != "2" and Rps != "3" and Rps != "4" and Rps != "h") :
+		print(RED + BOLD + "La commande que vous avez saisie n'existe pas" + RESET)
+		Rps = str(input(BOLD + BLUE + ">>> "))
+		print(RESET, end = '')
